@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Category Growth Codification Console</title>
+<style>
+:root{
+  --ink:#15171C; --paper:#FFFFFF; --panel:#F2F4F7; --line:#E3E6EC; --muted:#6B7280;
+  --teal:#0E7C66; --teal-l:#5EAD9B; --indigo:#4338CA; --indigo-l:#8E97E8;
+  --slate:#64748B; --clay:#C2410C; --gold:#B45309;
+  --maxw:1080px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--panel);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+header.top{background:var(--ink);color:#fff;padding:26px 0 0}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#9aa3b2;font-weight:600}
+header.top h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:6px 0 4px}
+header.top p.sub{margin:0 0 18px;color:#c5ccd8;font-size:13.5px;max-width:640px}
+nav.tabs{display:flex;gap:0;flex-wrap:wrap;border-top:1px solid #2a2e38}
+nav.tabs button{flex:1 1 auto;min-width:150px;background:none;border:none;color:#9aa3b2;cursor:pointer;
+  padding:14px 12px;font-size:13px;font-weight:600;border-bottom:2px solid transparent;text-align:left;
+  font-family:inherit;transition:color .15s}
+nav.tabs button .n{font-size:10px;letter-spacing:.18em;display:block;color:#5f6776;margin-bottom:3px}
+nav.tabs button:hover{color:#dfe4ec}
+nav.tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--teal-l)}
+nav.tabs button[aria-selected=true] .n{color:var(--teal-l)}
+
+main{padding:28px 0 64px}
+.panelpage{display:none;animation:fade .25s ease}
+.panelpage.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.lead{font-size:15px;color:#3b3f48;max-width:680px;margin:0 0 22px}
+.lead b{color:var(--ink)}
+
+.eras-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 24px}
+.era-card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.era-card .tag{font-size:10px;letter-spacing:.14em;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.era-card .yr{font-size:11px;color:var(--muted);margin-top:1px}
+.era-card .lbl{font-size:13px;font-weight:650;margin:7px 0 8px;min-height:34px}
+.era-card .cagr{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.era-card .cagr small{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0}
+.era-card .vol{font-size:11px;color:var(--muted);margin-top:2px}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card.full{grid-column:1 / -1}
+.card h3{margin:0 0 2px;font-size:14.5px;font-weight:650}
+.card .cap{margin:0 0 12px;font-size:12px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:11.5px;color:#3b3f48}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend i.ln{height:3px;width:16px;border-radius:2px}
+svg{width:100%;height:auto;display:block}
+text{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+
+.callout{background:#0E7C661a;border:1px solid #0E7C6644;border-left:4px solid var(--teal);
+  border-radius:10px;padding:14px 16px;margin-top:4px}
+.callout.warn{background:#C2410C14;border-color:#C2410C44;border-left-color:var(--clay)}
+.callout .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.callout.warn .k{color:var(--clay)}
+.callout p{margin:5px 0 0;font-size:13.5px;color:#26303a}
+.callout.warn p{color:#3a2820}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.kpi .v.dn{color:var(--clay)} .kpi .v.up{color:var(--teal)}
+.kpi .l{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+
+.vecgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:6px}
+.vec .h{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink)}
+.vec .d{font-size:11px;color:var(--muted);line-height:1.4;margin-top:7px}
+@media(max-width:980px){.vecgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.vecgrid{grid-template-columns:repeat(2,1fr)}}
+
+.recos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.reco{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;gap:13px}
+.reco .num{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;color:var(--teal);
+  border:1.5px solid var(--teal);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.reco .vlab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.reco h4{margin:3px 0 4px;font-size:13.5px}
+.reco p{margin:0;font-size:12.5px;color:#3b3f48;line-height:1.45}
+
+.compare{width:100%;border-collapse:collapse;margin-top:4px;font-size:13px}
+.compare th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line)}
+.compare td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare td.who{font-weight:650}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+.pill.up{background:#0E7C661a;color:var(--teal)} .pill.dn{background:#C2410C1a;color:var(--clay)}
+.pill.fl{background:#64748b1a;color:var(--slate)}
+
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);font-size:11.5px}
+@media(max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .eras-strip{grid-template-columns:1fr 1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .vectors{grid-template-columns:1fr 1fr}
+  .recos{grid-template-columns:1fr}
+  .era-card .lbl{min-height:0}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="eyebrow">P20Y Category Growth &middot; Decomposition Instrument</div>
+  <h1>Category Growth Codification Console</h1>
+  <p class="sub">Twenty years of an FMCG category, decomposed into growth eras, the volume/price/mix that built them, the demand vectors behind them, and where the landscape leaves the leader now. Synthetic illustrative data.</p>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-t="0"><span class="n">01 · WHAT HAPPENED</span>Category Growth</button>
+    <button role="tab" aria-selected="false" data-t="1"><span class="n">02 · WHY IT WON</span>Growth Vectors</button>
+    <button role="tab" aria-selected="false" data-t="2"><span class="n">03 · WHO WON</span>Share &amp; Contribution</button>
+    <button role="tab" aria-selected="false" data-t="3"><span class="n">04 · SO WHAT</span>Now &amp; Outlook</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <!-- TAB 0 -->
+  <section class="panelpage active" id="p0">
+    <p class="lead">The category grew <b id="mult"></b> in volume over twenty years, but not evenly. Four eras tell different stories &mdash; and the volume/price/mix split reveals which growth was real demand versus inflation.</p>
+    <div class="eras-strip" id="eraStrip"></div>
+    <div class="grid">
+      <div class="card full"><h3>Category trajectory &amp; growth eras</h3><p class="cap">Indexed to base year = 100. Volume vs value.</p><div id="c_traj"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--teal)"></i>Volume index</span><span><i class="ln" style="background:var(--indigo)"></i>Value index</span></div></div>
+      <div class="card"><h3>Volume / price / mix by era</h3><p class="cap">Points of value CAGR. Bars sum to the era's value growth; the marker is total value CAGR.</p><div id="c_vpm"></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Volume</span><span><i style="background:var(--slate)"></i>Price</span><span><i style="background:var(--indigo)"></i>Mix</span><span><i style="background:var(--ink)"></i>Value CAGR</span></div></div>
+      <div class="card"><h3>Pricing vs inflation</h3><p class="cap">Category price index against CPI. Gap below CPI = real accessibility.</p><div id="c_infl"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--clay)"></i>Category price</span><span><i class="ln" style="background:var(--muted)"></i>CPI</span></div></div>
+    </div>
+    <div class="callout"><span class="k">Read</span><p id="read0"></p></div>
+  </section>
+
+  <!-- TAB 1 -->
+  <section class="panelpage" id="p1">
+    <p class="lead">High-growth eras were <b>volume-led</b>, and that volume came from <b>penetration &mdash; new category users</b> &mdash; not from existing buyers spending more. Penetration was won by five vectors firing together.</p>
+    <div class="grid">
+      <div class="card"><h3>Demand driver tree</h3><p class="cap">Penetration, consumption per buyer, premiumization. Indexed to base = 100.</p><div id="c_drv"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--teal)"></i>Penetration</span><span><i class="ln" style="background:var(--indigo)"></i>Consumption/buyer</span><span><i class="ln" style="background:var(--gold)"></i>Premiumization</span></div></div>
+      <div class="card"><h3>Tier &times; pack mix shift</h3><p class="cap">Value share of the four cells over time.</p><div id="c_mix"></div>
+        <div class="legend" id="mixleg"></div></div>
+    </div>
+    <div style="margin:6px 0 12px"><h3 style="margin:0 0 3px;font-size:15px">How each vector moved &mdash; and how differently, era to era</h3>
+      <p class="cap" style="font-size:12.5px">The actual in-process metric behind each vector across twenty years. Era bands carry each era's rate of change, so you see the shift in what was being done, not just the result. E2's band is tinted.</p></div>
+    <div class="grid" id="vectors"></div>
+    <div class="grid"><div class="card full"><h3>Comms vector &middot; benefit-space map</h3><p class="cap">The fifth vector, in process: share of media weight by benefit space, by year. Concentrated on one conversion message through E2, fragmented across spaces after.</p><div id="c_media"></div>
+      <div class="legend" id="medleg"></div></div></div>
+    <div class="callout"><span class="k">Read</span><p id="read1"></p></div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panelpage" id="p2">
+    <p class="lead">The leader <b>Auria</b> didn't just ride the category &mdash; it drove a disproportionate share of growth, pulling share from <b>46% to a 66% peak</b>. Then the curve turned.</p>
+    <div class="grid">
+      <div class="card full"><h3>Manufacturer value share</h3><p class="cap">Annual value share, four players.</p><div id="c_share"></div>
+        <div class="legend" id="brleg"></div></div>
+      <div class="card full"><h3>Contribution to growth vs fair share</h3><p class="cap">By era: Auria's share of category growth (bar) against its average market share (marker). Above the marker = winning more than its fair share.</p><div id="c_fair"></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Contribution to growth</span><span><i style="background:var(--ink)"></i>Avg market share (fair share)</span></div></div>
+    </div>
+    <div class="callout"><span class="k">Read</span><p id="read2"></p></div>
+  </section>
+
+  <!-- TAB 3 -->
+  <section class="panelpage" id="p3">
+    <p class="lead">Today the engine that built the category &mdash; penetration of the core tier &mdash; has <b>saturated</b>. Growth has cooled to low single digits, buyers are down-tiering, and the value entrant is back. Here's the contrast and what to do.</p>
+    <div class="kpis" id="nowkpis"></div>
+    <div class="grid">
+      <div class="card"><h3>What changed</h3><p class="cap">The vectors that won, now turning.</p>
+        <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;color:#3b3f48;line-height:1.7" id="changed"></ul></div>
+      <div class="card"><h3>Competitive read &mdash; now</h3><p class="cap">Where each player is pressing.</p>
+        <table class="compare"><thead><tr><th>Player</th><th>Move</th><th>Trajectory</th></tr></thead><tbody id="comprows"></tbody></table></div>
+    </div>
+    <div class="card full" style="margin-bottom:16px"><h3>Recommendations to stay competitive</h3><p class="cap">Mapped to the five vectors, anchored to where the data turned.</p>
+      <div class="recos" id="recos"></div></div>
+    <div class="callout warn"><span class="k">Bottom line</span><p id="read3"></p></div>
+  </section>
+</main>
+
+<footer class="wrap">Synthetic, illustrative dataset &mdash; no real brand, category, or figure. Built as a portfolio demonstration of category-growth decomposition. Tier (Base/Premium) &times; pack (Small/Big), four manufacturers, twenty years.</footer>
+
+<script>
+const D = {"years": [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], "gyears": [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], "category": {"units": [1000.0, 1040.01, 1071.21, 1114.05, 1169.75, 1216.53, 1253.04, 1453.53, 1657.01, 1938.71, 2190.74, 2519.35, 2922.45, 3331.59, 3664.75, 3957.93, 4314.13, 4529.85, 4393.95, 4569.71, 4706.81], "value": [11050.0, 11887.0, 12665.0, 13624.0, 14797.0, 15918.0, 16959.0, 19941.0, 23044.0, 27330.0, 31306.0, 36494.0, 42912.0, 49588.0, 57089.0, 64529.0, 73614.0, 80736.0, 81800.0, 88860.0, 95601.0], "value_index": [100.0, 107.6, 114.6, 123.3, 133.9, 144.1, 153.5, 180.5, 208.5, 247.3, 283.3, 330.3, 388.3, 448.8, 516.6, 584.0, 666.2, 730.6, 740.3, 804.2, 865.2], "vol_index": [100.0, 104.0, 107.1, 111.4, 117.0, 121.7, 125.3, 145.4, 165.7, 193.9, 219.1, 251.9, 292.2, 333.2, 366.5, 395.8, 431.4, 453.0, 439.4, 457.0, 470.7], "price_index": [100.0, 103.44, 106.99, 110.67, 114.48, 118.41, 122.48, 124.16, 125.86, 127.58, 129.32, 131.09, 132.88, 134.7, 140.98, 147.54, 154.42, 161.29, 168.48, 175.98, 183.81], "cpi_index": [100.0, 104.0, 108.2, 112.5, 117.0, 121.7, 126.5, 130.3, 134.2, 138.3, 142.4, 146.7, 151.1, 155.6, 161.8, 168.3, 175.0, 182.0, 189.3, 196.9, 204.8], "units_mult": 4.7}, "cells": {"order": ["BS", "BB", "PS", "PB"], "label": {"BS": "Base \u00b7 Small", "BB": "Base \u00b7 Big", "PS": "Premium \u00b7 Small", "PB": "Premium \u00b7 Big"}, "vshare": {"BS": [49.77, 49.35, 48.93, 48.5, 48.08, 47.66, 47.23, 47.03, 46.83, 46.63, 46.43, 46.23, 46.03, 45.83, 43.93, 42.03, 40.15, 40.85, 41.55, 42.26, 42.96], "BB": [13.03, 13.28, 13.53, 13.78, 14.03, 14.28, 14.53, 14.76, 14.99, 15.21, 15.44, 15.67, 15.9, 16.13, 16.6, 17.06, 17.52, 17.16, 16.8, 16.45, 16.09], "PS": [28.96, 28.74, 28.51, 28.29, 28.06, 27.84, 27.61, 27.23, 26.85, 26.47, 26.09, 25.7, 25.32, 24.93, 24.41, 23.88, 23.36, 23.0, 22.65, 22.29, 21.94], "PB": [8.24, 8.63, 9.03, 9.43, 9.83, 10.23, 10.63, 10.98, 11.33, 11.68, 12.04, 12.39, 12.75, 13.11, 15.07, 17.03, 18.98, 18.99, 19.0, 19.0, 19.01]}}, "brands": {"order": ["Auria", "Nello", "Pavo", "Mercato PL"], "share": {"Auria": [46.0, 45.67, 45.33, 45.0, 44.67, 44.33, 44.0, 46.57, 49.14, 51.71, 54.29, 56.86, 59.43, 62.0, 63.33, 64.67, 66.0, 64.25, 62.5, 60.75, 59.0], "Nello": [24.0, 24.17, 24.33, 24.5, 24.67, 24.83, 25.0, 24.0, 23.0, 22.0, 21.0, 20.0, 19.0, 18.0, 17.33, 16.67, 16.0, 16.25, 16.5, 16.75, 17.0], "Pavo": [12.0, 12.17, 12.33, 12.5, 12.67, 12.83, 13.0, 12.86, 12.71, 12.57, 12.43, 12.29, 12.14, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0], "Mercato PL": [18.0, 18.0, 18.0, 18.0, 18.0, 18.0, 18.0, 16.57, 15.14, 13.71, 12.29, 10.86, 9.43, 8.0, 7.33, 6.67, 6.0, 7.5, 9.0, 10.5, 12.0]}}, "drivers": {"penetration": [100.0, 101.3, 102.7, 104.0, 105.3, 106.7, 108.0, 114.0, 120.0, 126.0, 132.0, 138.0, 144.0, 150.0, 152.7, 155.3, 158.0, 156.5, 155.0, 153.5, 152.0], "consumption": [100.0, 100.5, 101.0, 101.5, 102.0, 102.5, 103.0, 105.1, 107.3, 109.4, 111.6, 113.7, 115.9, 118.0, 122.0, 126.0, 130.0, 129.5, 129.0, 128.5, 128.0], "premiumization": [100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 106.9, 107.7, 108.6, 109.4, 110.3, 111.1, 112.0, 121.3, 130.7, 140.0, 139.5, 139.0, 138.5, 138.0]}, "media": {"benefits": ["Value & Longevity", "Everyday Performance", "Hygiene & Protection", "Premium Care", "Smart Value"], "share": {"Value & Longevity": [35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 50, 25, 25, 25, 18, 18, 18, 18], "Everyday Performance": [40, 40, 40, 40, 40, 40, 25, 25, 25, 25, 25, 25, 25, 20, 20, 20, 17, 17, 17, 17], "Hygiene & Protection": [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 22, 22, 22, 22], "Premium Care": [5, 5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 35, 35, 35, 23, 23, 23, 23], "Smart Value": [5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 20, 20, 20, 20]}, "grp_total": [11000, 12000, 13000, 14000, 16000, 18000, 24000, 30000, 38000, 42000, 46000, 52000, 55000, 58000, 60000, 50000, 48000, 38000, 42000, 40000]}, "distribution": {"nd": [48.0, 49.2, 50.3, 51.5, 52.7, 53.8, 55.0, 58.3, 61.6, 64.9, 68.1, 71.4, 74.7, 78.0, 80.0, 82.0, 84.0, 83.0, 82.0, 81.0, 80.0], "tdp": [100.0, 103.3, 106.7, 110.0, 113.3, 116.7, 120.0, 132.9, 145.7, 158.6, 171.4, 184.3, 197.1, 210.0, 220.0, 230.0, 240.0, 236.2, 232.5, 228.8, 225.0]}, "vpm": [{"era": "E1", "label": "Stable Base Growth", "start": 2003, "end": 2008, "value_cagr": 7.4, "volume_cagr": 3.83, "volume_pts": 3.5, "price_pts": 3.96, "mix_pts": -0.06, "price_growth": 3.44, "cpi_growth": 4.0, "price_vs_inflation": -0.56}, {"era": "E2", "label": "Penetration Explosion", "start": 2009, "end": 2015, "value_cagr": 16.57, "volume_cagr": 14.99, "volume_pts": 14.28, "price_pts": 2.49, "mix_pts": -0.21, "price_growth": 1.37, "cpi_growth": 3.0, "price_vs_inflation": -1.63}, {"era": "E3", "label": "Premiumization & Big Pack", "start": 2016, "end": 2018, "value_cagr": 14.08, "volume_cagr": 9.0, "volume_pts": 8.57, "price_pts": 5.33, "mix_pts": 0.17, "price_growth": 4.66, "cpi_growth": 4.0, "price_vs_inflation": 0.66}, {"era": "E4", "label": "Saturation & Competitive Shift", "start": 2019, "end": 2022, "value_cagr": 6.75, "volume_cagr": 2.2, "volume_pts": 2.06, "price_pts": 4.74, "mix_pts": -0.04, "price_growth": 4.45, "cpi_growth": 4.0, "price_vs_inflation": 0.45}], "eras": [{"era": "E1", "start": 2003, "end": 2008, "label": "Stable Base Growth"}, {"era": "E2", "start": 2009, "end": 2015, "label": "Penetration Explosion"}, {"era": "E3", "start": 2016, "end": 2018, "label": "Premiumization & Big Pack"}, {"era": "E4", "start": 2019, "end": 2022, "label": "Saturation & Competitive Shift"}], "era_fair": [{"era": "E1", "label": "Stable Base Growth", "contrib": 40.3, "share": 44.8, "gap": -4.5}, {"era": "E2", "label": "Penetration Explosion", "contrib": 71.4, "share": 54.3, "gap": 17.1}, {"era": "E3", "label": "Premiumization & Big Pack", "contrib": 74.3, "share": 64.7, "gap": 9.6}, {"era": "E4", "label": "Saturation & Competitive Shift", "contrib": 35.6, "share": 61.6, "gap": -26.0}], "portfolio": [100.0, 101.3, 102.7, 104.0, 105.3, 106.7, 108.0, 116.1, 124.3, 132.4, 140.6, 148.7, 156.9, 165.0, 175.0, 185.0, 195.0, 195.8, 196.5, 197.2, 198.0], "skus": {"entry": [6, 6, 7, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 15, 16, 16, 16, 16, 16, 16], "premium": [3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 10, 12, 12, 12, 12, 12]}, "vectors": {"portfolio": [1.3, 6.0, 5.6, 0.4], "media": [10.4, 14.8, -7.2, -5.9], "distribution": [3.0, 7.9, 4.4, -1.6], "comms": [35, 50, 25, 18], "pricing": [-0.56, -1.63, 0.66, 0.45]}};
+const C = {teal:'#0E7C66',tealL:'#5EAD9B',indigo:'#4338CA',indigoL:'#8E97E8',slate:'#64748B',clay:'#C2410C',gold:'#B45309',ink:'#15171C',muted:'#6B7280',line:'#E3E6EC'};
+const CELLCOL={BS:C.teal,BB:C.tealL,PS:C.indigo,PB:C.indigoL};
+const BRCOL={'Auria':C.teal,'Nello':C.slate,'Pavo':C.indigo,'Mercato PL':C.clay};
+const BENCOL=[C.teal,C.tealL,C.slate,C.indigo,C.clay];
+const Y=D.years, Y0=Y[0], Y1=Y[Y.length-1];
+
+// ---- svg helpers ----
+const W=760,H=380,M={l:54,r:18,t:26,b:34};
+const IW=W-M.l-M.r, IH=H-M.t-M.b;
+function sx(y){return M.l + (y-Y0)/(Y1-Y0)*IW;}
+function svg(extra){return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${extra}</svg>`;}
+function eraBands(){
+  let s='';
+  D.eras.forEach((e,i)=>{
+    const x0=sx(e.start-0.5), x1=sx(e.end+0.5);
+    s+=`<rect x="${x0}" y="${M.t}" width="${x1-x0}" height="${IH}" fill="${i%2?'#0E7C66':'#4338CA'}" opacity="0.04"/>`;
+    s+=`<text x="${(x0+x1)/2}" y="${M.t-9}" text-anchor="middle" font-size="10" font-weight="700" fill="${C.muted}">${e.era}</text>`;
+  });
+  return s;
+}
+function xAxis(yPix){
+  let s=`<line x1="${M.l}" y1="${yPix}" x2="${W-M.r}" y2="${yPix}" stroke="${C.line}"/>`;
+  [2002,2007,2012,2017,2022].forEach(y=>{
+    s+=`<text x="${sx(y)}" y="${yPix+15}" text-anchor="middle" font-size="10" fill="${C.muted}">'${String(y).slice(2)}</text>`;
+  });
+  return s;
+}
+function yGrid(vmin,vmax,yScale,fmt){
+  let s='';const steps=4;
+  for(let i=0;i<=steps;i++){
+    const v=vmin+(vmax-vmin)*i/steps, yp=yScale(v);
+    s+=`<line x1="${M.l}" y1="${yp}" x2="${W-M.r}" y2="${yp}" stroke="${C.line}" stroke-dasharray="2 3"/>`;
+    s+=`<text x="${M.l-8}" y="${yp+3}" text-anchor="end" font-size="10" fill="${C.muted}">${fmt(v)}</text>`;
+  }
+  return s;
+}
+function linePath(vals,yScale){
+  return vals.map((v,i)=>`${i?'L':'M'}${sx(Y[i]).toFixed(1)},${yScale(v).toFixed(1)}`).join(' ');
+}
+
+// ---- TAB 0 ----
+function eraStrip(){
+  document.getElementById('mult').textContent = D.category.units_mult+'x';
+  document.getElementById('eraStrip').innerHTML = D.vpm.map(v=>`
+    <div class="era-card"><div class="tag">${v.era} · ${v.label}</div><div class="yr">${v.start}–${v.end}</div>
+    <div class="lbl">${v.label}</div>
+    <div class="cagr">${v.value_cagr}%<small> value CAGR</small></div>
+    <div class="vol">${v.volume_cagr}% volume · ${v.price_vs_inflation>=0?'+':''}${v.price_vs_inflation}pt vs CPI</div></div>`).join('');
+}
+function chartTraj(){
+  const a=D.category.vol_index, b=D.category.value_index;
+  const vmax=Math.max(...a,...b)*1.05, vmin=80;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  g+=`<path d="${linePath(a,ys)}" fill="none" stroke="${C.teal}" stroke-width="2.4"/>`;
+  g+=`<path d="${linePath(b,ys)}" fill="none" stroke="${C.indigo}" stroke-width="2.4" stroke-dasharray="1 0"/>`;
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_traj').innerHTML=svg(g);
+}
+function chartVPM(){
+  const eras=D.vpm, n=eras.length, comps=[['volume_pts',C.teal],['price_pts',C.slate],['mix_pts',C.indigo]];
+  let vmax=0,vmin=0;
+  eras.forEach(e=>comps.forEach(([k])=>{vmax=Math.max(vmax,e[k],e.value_cagr);vmin=Math.min(vmin,e[k]);}));
+  vmax=Math.ceil(vmax+1);vmin=Math.floor(vmin-0.5);
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  const gw=plotW/n, bw=gw*0.2;
+  let g=yGrid(vmin,vmax,ys,v=>v.toFixed(0));
+  g+=`<line x1="${L}" y1="${ys(0)}" x2="${R}" y2="${ys(0)}" stroke="${C.muted}"/>`;
+  eras.forEach((e,i)=>{
+    const cx=L+gw*(i+0.5);
+    comps.forEach(([k,col],j)=>{
+      const v=e[k], x=cx+(j-1)*bw-bw/2, y0=ys(0), y1=ys(v);
+      g+=`<rect x="${x}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" fill="${col}" rx="1.5"/>`;
+    });
+    g+=`<circle cx="${cx}" cy="${ys(e.value_cagr)}" r="4" fill="${C.ink}"/>`;
+    g+=`<text x="${cx}" y="${ys(e.value_cagr)-9}" text-anchor="middle" font-size="10" font-weight="700" fill="${C.ink}">${e.value_cagr}</text>`;
+    g+=`<text x="${cx}" y="${M.t+IH+15}" text-anchor="middle" font-size="10" fill="${C.muted}">${e.era}</text>`;
+  });
+  document.getElementById('c_vpm').innerHTML=svg(g);
+}
+function chartInfl(){
+  const a=D.category.price_index, b=D.category.cpi_index;
+  const vmax=Math.max(...a,...b)*1.04, vmin=95;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  g+=`<path d="${linePath(b,ys)}" fill="none" stroke="${C.muted}" stroke-width="2" stroke-dasharray="5 4"/>`;
+  g+=`<path d="${linePath(a,ys)}" fill="none" stroke="${C.clay}" stroke-width="2.4"/>`;
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_infl').innerHTML=svg(g);
+}
+
+// ---- TAB 1 ----
+function chartDrv(){
+  const ks=[['penetration',C.teal],['consumption',C.indigo],['premiumization',C.gold]];
+  let all=[];ks.forEach(([k])=>all=all.concat(D.drivers[k]));
+  const vmax=Math.max(...all)*1.04, vmin=Math.min(...all)*0.97;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  ks.forEach(([k,col])=>g+=`<path d="${linePath(D.drivers[k],ys)}" fill="none" stroke="${col}" stroke-width="2.4"/>`);
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_drv').innerHTML=svg(g);
+}
+function chartMix(){
+  const order=D.cells.order, ys=v=>M.t+IH-v/100*IH;
+  let cum=Y.map(()=>0), g=yGrid(0,100,ys,v=>v+'%');
+  order.forEach(c=>{
+    const top=cum.map((b,i)=>b+D.cells.vshare[c][i]);
+    let path=`M${sx(Y0)},${ys(cum[0])}`;
+    Y.forEach((y,i)=>path+=`L${sx(y).toFixed(1)},${ys(top[i]).toFixed(1)}`);
+    for(let i=Y.length-1;i>=0;i--)path+=`L${sx(Y[i]).toFixed(1)},${ys(cum[i]).toFixed(1)}`;
+    path+='Z';
+    g+=`<path d="${path}" fill="${CELLCOL[c]}" opacity="0.88"/>`;
+    cum=top;
+  });
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_mix').innerHTML=svg(g);
+  document.getElementById('mixleg').innerHTML=order.map(c=>`<span><i style="background:${CELLCOL[c]}"></i>${D.cells.label[c]}</span>`).join('');
+}
+function trendChart(o){
+  const w=400,h=240,m={l:46,r:14,t:30,b:28}, iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const xs=y=>m.l+(y-Y0)/(Y1-Y0)*iw;
+  const ys=v=>m.t+ih-(v-o.yMin)/(o.yMax-o.yMin)*ih;
+  let g='';
+  D.eras.forEach((e,i)=>{
+    const x0=xs(e.start-0.5), x1=xs(e.end+0.5), isE2=i===1;
+    g+=`<rect x="${x0}" y="${m.t}" width="${x1-x0}" height="${ih}" fill="${isE2?C.teal:'#94a3b8'}" opacity="${isE2?0.10:0.05}"/>`;
+    g+=`<text x="${(x0+x1)/2}" y="${m.t-15}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${isE2?C.teal:C.muted}">${e.era}</text>`;
+    g+=`<text x="${(x0+x1)/2}" y="${m.t-4}" text-anchor="middle" font-size="10" font-weight="700" fill="${isE2?C.teal:C.slate}">${o.eraLabels[i]}</text>`;
+  });
+  for(let k=0;k<=3;k++){const v=o.yMin+(o.yMax-o.yMin)*k/3, yp=ys(v);
+    g+=`<line x1="${m.l}" y1="${yp}" x2="${w-m.r}" y2="${yp}" stroke="${C.line}" stroke-dasharray="2 3"/>`;
+    g+=`<text x="${m.l-6}" y="${yp+3}" text-anchor="end" font-size="9.5" fill="${C.muted}">${o.yFmt(v)}</text>`;}
+  if(o.zeroLine){const yp=ys(0);g+=`<line x1="${m.l}" y1="${yp}" x2="${w-m.r}" y2="${yp}" stroke="${C.muted}" stroke-width="1"/>`;}
+  [2002,2012,2022].forEach(y=>g+=`<text x="${xs(y)}" y="${h-8}" text-anchor="middle" font-size="9.5" fill="${C.muted}">'${String(y).slice(2)}</text>`);
+  o.series.forEach(s=>{
+    const pts=s.x.map((xx,i)=>[xs(xx),ys(s.y[i])]);
+    if(s.fillToZero){let d=`M${pts[0][0].toFixed(1)},${ys(0)}`;pts.forEach(p=>d+=`L${p[0].toFixed(1)},${p[1].toFixed(1)}`);d+=`L${pts[pts.length-1][0].toFixed(1)},${ys(0)}Z`;
+      g+=`<path d="${d}" fill="${s.color}" opacity="0.14"/>`;}
+    g+=`<path d="${pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}" fill="none" stroke="${s.color}" stroke-width="${s.width||2.4}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`;
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%">${g}</svg>`;
+}
+function vectors(){
+  const V=D.vectors, Y=D.years, GY=D.gyears, pe=a=>a.map(v=>(v>0?'+':'')+Math.round(v)+'%');
+  const mx=a=>Math.max(...a), legrow=(arr)=>`<div class="legend">${arr.map(([c,t,ln])=>`<span><i class="${ln?'ln':''}" style="background:${c};${ln?'height:3px;width:16px':''}"></i>${t}</span>`).join('')}</div>`;
+  // PORTFOLIO — entry vs premium SKUs actually in market
+  const eS=D.skus.entry, pS=D.skus.premium, smax=mx(eS.concat(pS))*1.25;
+  const port=trendChart({yMin:0,yMax:smax,yFmt:v=>Math.round(v),eraLabels:pe(V.portfolio),zeroLine:false,
+    series:[{x:Y,y:eS,color:C.gold,width:2.6},{x:Y,y:pS,color:C.indigo,width:2.6}]});
+  // MEDIA — GRP level
+  const grp=D.media.grp_total;
+  const media=trendChart({yMin:0,yMax:mx(grp)*1.12,yFmt:v=>Math.round(v/1000)+'k',eraLabels:pe(V.media),
+    series:[{x:GY,y:grp,color:C.indigo,width:2.6,fillToZero:true}]});
+  // PRICING — price index vs CPI, the gap is the story
+  const pi=D.category.price_index, cpi=D.category.cpi_index, pmin=95, pmax=mx(pi.concat(cpi))*1.03;
+  const pricing=trendChart({yMin:pmin,yMax:pmax,yFmt:v=>Math.round(v),
+    eraLabels:V.pricing.map(v=>(v>0?'+':'')+v.toFixed(1)+'pt'),
+    series:[{x:Y,y:cpi,color:C.muted,width:2,dash:'5 4'},{x:Y,y:pi,color:C.clay,width:2.6}]});
+  // DISTRIBUTION — reach (ND) and shelf points (TDP), indexed to base
+  const nd=D.distribution.nd, tdp=D.distribution.tdp, nd0=nd[0];
+  const ndi=nd.map(v=>v/nd0*100);
+  const dist=trendChart({yMin:90,yMax:mx(ndi.concat(tdp))*1.08,yFmt:v=>Math.round(v),eraLabels:pe(V.distribution),
+    series:[{x:Y,y:ndi,color:C.teal,width:2.6},{x:Y,y:tdp,color:C.tealL,width:2.6,dash:'1 0'}]});
+  const cards=[
+    ['Portfolio','SKUs in market &mdash; entry vs premium',port,
+      [[C.gold,'Entry (Base) packs',0],[C.indigo,'Premium packs',0]],
+      'Entry packs were added fast in E2 to recruit new users; premium packs only multiplied in E3. The range you fielded was different in every era.'],
+    ['Media','Media weight &mdash; GRP per year',media,[[C.indigo,'GRP',true]],
+      'Spend sat low and flat through E1, then stepped up roughly 3x to carry the recruitment message in E2, plateaued in E3 and was pulled back in E4.'],
+    ['Pricing','Category price index vs CPI',pricing,[[C.clay,'Category price',true],[C.muted,'CPI',true]],
+      'Price tracked under inflation only in E2 &mdash; the lines split &mdash; keeping the category accessible during recruitment. From E3 price runs at or above CPI.'],
+    ['Distribution','Reach vs shelf points (indexed)',dist,[[C.teal,'Numeric distribution',true],[C.tealL,'Shelf points (TDP)',true]],
+      'Both reach and shelf points climbed steeply in E2; shelf points outran reach as pack-sizes multiplied. By E3 reach hit its ceiling and the curve flattens.'],
+  ];
+  document.getElementById('vectors').innerHTML=cards.map(([h,sub,svg,leg,d])=>`
+    <div class="card"><h3>${h}</h3><p class="cap">${sub}</p>${svg}${legrow(leg)}<p class="d" style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:10px 0 0">${d}</p></div>`).join('');
+}
+function chartMedia(){
+  const gy=D.gyears, bens=D.media.benefits, n=gy.length;
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-v/100*IH;
+  const bw=plotW/n*0.74, step=plotW/n;
+  let g=yGrid(0,100,ys,v=>v+'%');
+  gy.forEach((y,i)=>{
+    let base=0; const x=L+step*i+(step-bw)/2;
+    bens.forEach((b,j)=>{
+      const v=D.media.share[b][i], y1=ys(base+v), y0=ys(base);
+      g+=`<rect x="${x}" y="${y1}" width="${bw}" height="${y0-y1}" fill="${BENCOL[j]}" opacity="0.9"/>`;
+      base+=v;
+    });
+    if(i%3===0||i===n-1)g+=`<text x="${x+bw/2}" y="${M.t+IH+15}" text-anchor="middle" font-size="9" fill="${C.muted}">'${String(y).slice(2)}</text>`;
+  });
+  document.getElementById('c_media').innerHTML=svg(g);
+  document.getElementById('medleg').innerHTML=bens.map((b,j)=>`<span><i style="background:${BENCOL[j]}"></i>${b}</span>`).join('');
+}
+
+// ---- TAB 2 ----
+function chartShare(){
+  const ord=D.brands.order;
+  let all=[];ord.forEach(b=>all=all.concat(D.brands.share[b]));
+  const vmax=Math.max(...all)*1.05, vmin=0;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v)+'%');
+  ord.forEach(b=>{
+    g+=`<path d="${linePath(D.brands.share[b],ys)}" fill="none" stroke="${BRCOL[b]}" stroke-width="${b==='Auria'?3:2}"/>`;
+  });
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_share').innerHTML=svg(g);
+  document.getElementById('brleg').innerHTML=ord.map(b=>`<span><i class="ln" style="background:${BRCOL[b]}"></i>${b}</span>`).join('');
+}
+function chartFair(){
+  const ef=D.era_fair, n=ef.length;
+  const vmax=Math.max(...ef.map(e=>Math.max(e.contrib,e.share)))*1.12;
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-v/vmax*IH;
+  const gw=plotW/n, bw=gw*0.4;
+  let g=yGrid(0,vmax,ys,v=>Math.round(v)+'%');
+  ef.forEach((e,i)=>{
+    const cx=L+gw*(i+0.5), x=cx-bw/2, above=e.contrib>=e.share;
+    g+=`<rect x="${x}" y="${ys(e.contrib)}" width="${bw}" height="${M.t+IH-ys(e.contrib)}" fill="${above?C.teal:C.clay}" rx="2"/>`;
+    g+=`<text x="${cx}" y="${ys(e.contrib)-7}" text-anchor="middle" font-size="11" font-weight="700" fill="${above?C.teal:C.clay}">${e.contrib}%</text>`;
+    // fair share marker
+    g+=`<line x1="${x-6}" y1="${ys(e.share)}" x2="${x+bw+6}" y2="${ys(e.share)}" stroke="${C.ink}" stroke-width="2.4"/>`;
+    g+=`<text x="${cx}" y="${M.t+IH+15}" text-anchor="middle" font-size="10" fill="${C.muted}">${e.era}</text>`;
+  });
+  document.getElementById('c_fair').innerHTML=svg(g);
+}
+
+// ---- TAB 3 ----
+function nowTab(){
+  const pen=D.drivers.penetration, sh=D.brands.share, mer=sh['Mercato PL'], aur=sh['Auria'];
+  const lastE=D.vpm[3], penPeak=Math.max(...pen), penPeakYr=Y[pen.indexOf(penPeak)];
+  const aurPeak=Math.max(...aur), aurNow=aur[aur.length-1];
+  const merTrough=Math.min(...mer), merNow=mer[mer.length-1];
+  document.getElementById('nowkpis').innerHTML=`
+    <div class="kpi"><div class="v dn">${lastE.value_cagr}%</div><div class="l">Value CAGR now (E4) vs ${D.vpm[1].value_cagr}% at peak (E2)</div></div>
+    <div class="kpi"><div class="v dn">${aurNow}%</div><div class="l">Leader share, down from ${aurPeak}% peak</div></div>
+    <div class="kpi"><div class="v up">${merNow}%</div><div class="l">Value entrant share, recovered from ${merTrough}% trough</div></div>
+    <div class="kpi"><div class="v">${lastE.volume_cagr}%</div><div class="l">Volume CAGR now &mdash; growth is price, not demand</div></div>`;
+  document.getElementById('changed').innerHTML=[
+    `Penetration <b>saturated</b> &mdash; peaked ~${penPeakYr} and has since slipped, so the new-user engine that built E2 is spent.`,
+    `Buyers are <b>down-tiering</b>: Base/Small value share rebounded in E4 after the premium run.`,
+    `The <b>value entrant returned</b> (${merTrough}% &rarr; ${merNow}%), taking incremental growth the leader used to own.`,
+    `Growth is now <b>price-led</b> (${lastE.volume_cagr}% volume of ${lastE.value_cagr}% value), and price has caught back up to inflation.`,
+  ].map(t=>`<li>${t}</li>`).join('');
+  document.getElementById('comprows').innerHTML=[
+    ['Value entrant','Re-pricing into reopened entry tiers','up','Gaining'],
+    ['Premium niche','Holding premium/big-pack buyers','fl','Stable'],
+    ['Mainstream rival','Defensive, ceding share','dn','Slipping'],
+    ['Leader (you)','Over-indexed on a saturated vector','dn','At risk'],
+  ].map(([w,m,t,lab])=>`<tr><td class="who">${w}</td><td>${m}</td><td><span class="pill ${t}">${lab}</span></td></tr>`).join('');
+  const recos=[
+    ['Portfolio','Re-open the entry door','Barbell the range: refresh accessible Base/Small trial packs to restart penetration, while defending the Premium/Big ceiling that drove E3 value.'],
+    ['Media','Rebalance benefit spaces','Weight was over-rotated to Value &amp; Longevity for a decade. Shift toward Smart Value and Hygiene &amp; Protection to meet the value entrant where it is winning.'],
+    ['Pricing','Protect entry price points','E4 pricing ran ahead of volume. Hold price-pack entry to slow down-tiering rather than harvest price into a softening category.'],
+    ['Distribution','Defend the shelf','Numeric distribution has plateaued near its ceiling; the next point comes from TDP &mdash; more pack-sizes per store &mdash; not new stores, especially against value-entrant listings.'],
+    ['Comms','Shift conversion to retention','The job moved from trading new users in to keeping them from trading down. Lead on superiority versus the value alternatives, not versus the legacy form that has already gone.'],
+  ];
+  document.getElementById('recos').innerHTML=recos.map((r,i)=>`
+    <div class="reco"><div class="num">${String(i+1).padStart(2,'0')}</div>
+    <div><div class="vlab">${r[0]}</div><h4>${r[1]}</h4><p>${r[2]}</p></div></div>`).join('');
+  document.getElementById('read3').textContent=
+    `The category was built on penetration, and penetration is done. Defending the ${aurNow}% share means re-opening new-user access and meeting the value entrant on price-pack and message — not harvesting price out of a category growing only ${lastE.volume_cagr}% in real volume.`;
+}
+
+function reads(){
+  document.getElementById('read0').innerHTML=`The high-growth era (E2, ${D.vpm[1].value_cagr}% value CAGR) was overwhelmingly <b>volume-led</b> — ${D.vpm[1].volume_pts} of ${D.vpm[1].value_cagr} points came from volume, with pricing held ${Math.abs(D.vpm[1].price_vs_inflation)}pt below inflation. The category never bought its way to growth; it recruited users. E4 inverts this: thin volume, price doing the work.`;
+  document.getElementById('read1').innerHTML=`Penetration is the lead line through E2 — new buyers entering the category — while consumption and premiumization only take over in E3. Underneath sits five vectors moving together: an accessible portfolio, 3x media weight on a single conversion message, pricing below inflation, distribution reaching from ${D.distribution.nd[0]}% to ${D.distribution.nd[D.distribution.nd.length-1]}% of stores, and comms concentrated on Value &amp; Longevity.`;
+  document.getElementById('read2').innerHTML=`In E2–E3 Auria's contribution to growth ran far above its fair share — it captured more of every incremental point than its size entitled it to. In E4 that flips: contribution falls toward and below fair share as the value entrant takes the marginal growth.`;
+}
+
+// ---- tabs ----
+let built=[false,false,false,false];
+function build(t){
+  if(built[t])return; built[t]=true;
+  if(t===0){eraStrip();chartTraj();chartVPM();chartInfl();}
+  if(t===1){chartDrv();chartMix();vectors();chartMedia();}
+  if(t===2){chartShare();chartFair();}
+  if(t===3){nowTab();}
+  if(t===0)reads(); if(t===1)reads(); if(t===2)reads();
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const t=+b.dataset.t;
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.panelpage').forEach((p,i)=>p.classList.toggle('active',i===t));
+    build(t);
+  });
+});
+reads(); build(0);
+</script>
+</body>
+</html>

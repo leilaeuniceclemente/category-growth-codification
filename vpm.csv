@@ -1,0 +1,5 @@
+era,label,start,end,value_cagr,volume_cagr,volume_pts,price_pts,mix_pts,price_growth,cpi_growth,price_vs_inflation
+E1,Stable Base Growth,2003,2008,7.4,3.83,3.5,3.96,-0.06,3.44,4.0,-0.56
+E2,Penetration Explosion,2009,2015,16.57,14.99,14.28,2.49,-0.21,1.37,3.0,-1.63
+E3,Premiumization & Big Pack,2016,2018,14.08,9.0,8.57,5.33,0.17,4.66,4.0,0.66
+E4,Saturation & Competitive Shift,2019,2022,6.75,2.2,2.06,4.74,-0.04,4.45,4.0,0.45
