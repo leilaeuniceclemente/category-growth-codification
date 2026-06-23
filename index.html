@@ -1,590 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
-<title>Upsizing Decision Console</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<title>Category Growth Codification Console</title>
 <style>
-  :root {
-    --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a; --border: #2e3350;
-    --accent: #7c6af7; --accent2: #4ecdc4; --warn: #f7b731; --danger: #fc5c65;
-    --ok: #26de81; --text: #e8eaf0; --muted: #8b90a7;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Inter','Segoe UI',sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+:root{
+  color-scheme: light only;
+  --ink:#15171C; --paper:#FFFFFF; --panel:#F2F4F7; --line:#E3E6EC; --muted:#6B7280;
+  --teal:#0E7C66; --teal-l:#5EAD9B; --indigo:#4338CA; --indigo-l:#8E97E8;
+  --slate:#64748B; --clay:#C2410C; --gold:#B45309;
+  --maxw:1080px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#F2F4F7;color:#15171C}
+body{background:var(--panel);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 
-  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center; gap: 16px; }
-  .header-icon { width: 36px; height: 36px; background: linear-gradient(135deg,var(--accent),var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-  .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
-  .header-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .header-badge { margin-left: auto; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--muted); flex-shrink: 0; }
+header.top{background:var(--ink);color:#fff;padding:26px 0 0}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#9aa3b2;font-weight:600}
+header.top h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:6px 0 4px}
+header.top p.sub{margin:0 0 18px;color:#c5ccd8;font-size:13.5px;max-width:640px}
+nav.tabs{display:flex;gap:0;flex-wrap:wrap;border-top:1px solid #2a2e38}
+nav.tabs button{flex:1 1 auto;min-width:150px;background:none;border:none;color:#9aa3b2;cursor:pointer;
+  padding:14px 12px;font-size:13px;font-weight:600;border-bottom:2px solid transparent;text-align:left;
+  font-family:inherit;transition:color .15s}
+nav.tabs button .n{font-size:10px;letter-spacing:.18em;display:block;color:#5f6776;margin-bottom:3px}
+nav.tabs button:hover{color:#dfe4ec}
+nav.tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--teal-l)}
+nav.tabs button[aria-selected=true] .n{color:var(--teal-l)}
 
-  .tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); padding: 0 32px; }
-  .tab { padding: 14px 20px; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: var(--muted); transition: all 0.18s; white-space: nowrap; }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--accent); border-color: var(--accent); }
+main{padding:28px 0 64px}
+.panelpage{display:none;animation:fade .25s ease}
+.panelpage.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.lead{font-size:15px;color:#3b3f48;max-width:680px;margin:0 0 22px}
+.lead b{color:var(--ink)}
 
-  .main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
-  .panel { display: none; }
-  .panel.active { display: block; }
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.eras-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 24px}
+.era-card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.era-card .tag{font-size:10px;letter-spacing:.14em;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.era-card .yr{font-size:11px;color:var(--muted);margin-top:1px}
+.era-card .lbl{font-size:13px;font-weight:650;margin:7px 0 8px;min-height:34px}
+.era-card .cagr{font-size:23px;font-weight:700;letter-spacing:-.02em}
+.era-card .cagr small{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0}
+.era-card .vol{font-size:11px;color:var(--muted);margin-top:2px}
 
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.card.full{grid-column:1 / -1}
+.card h3{margin:0 0 2px;font-size:14.5px;font-weight:650}
+.card .cap{margin:0 0 12px;font-size:12px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:11.5px;color:#3b3f48}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.legend i.ln{height:3px;width:16px;border-radius:2px}
+svg{width:100%;height:auto;display:block}
+text{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
 
-  .control-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
-  .control-group { display: flex; flex-direction: column; gap: 6px; }
-  .control-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
-  .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .toggle { border-radius: 20px; padding: 7px 16px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); transition: all 0.15s; }
-  .toggle:hover { color: var(--text); border-color: var(--accent); }
-  .toggle.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.callout{background:#0E7C661a;border:1px solid #0E7C6644;border-left:4px solid var(--teal);
+  border-radius:10px;padding:14px 16px;margin-top:4px}
+.callout.warn{background:#C2410C14;border-color:#C2410C44;border-left-color:var(--clay)}
+.callout .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.callout.warn .k{color:var(--clay)}
+.callout p{margin:5px 0 0;font-size:13.5px;color:#26303a}
+.callout.warn p{color:#3a2820}
 
-  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-  .badge-ok     { background: rgba(38,222,129,0.12);  color: var(--ok); }
-  .badge-warn   { background: rgba(247,183,49,0.12);  color: var(--warn); }
-  .badge-danger { background: rgba(252,92,101,0.12);  color: var(--danger); }
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.kpi .v.dn{color:var(--clay)} .kpi .v.up{color:var(--teal)}
+.kpi .l{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
 
-  .profile-row { display: flex; gap: 12px; flex-wrap: wrap; }
-  .profile-stat { background: var(--surface2); border-radius: 8px; padding: 12px 16px; min-width: 120px; }
-  .profile-stat .stat-val   { font-size: 17px; font-weight: 700; }
-  .profile-stat .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.vecgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:6px}
+.vec .h{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink)}
+.vec .d{font-size:11px;color:var(--muted);line-height:1.4;margin-top:7px}
+@media(max-width:980px){.vecgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.vecgrid{grid-template-columns:repeat(2,1fr)}}
 
-  .sulit-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .sulit-label { font-size: 12px; width: 170px; color: var(--muted); flex-shrink: 0; }
-  .sulit-bar-bg { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-  .sulit-bar-fill { height: 100%; border-radius: 4px; transition: width 0.45s cubic-bezier(.4,0,.2,1); }
-  .sulit-val { font-size: 12px; font-weight: 700; width: 40px; text-align: right; }
-  #sulit-verdict { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.recos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.reco{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:14px 16px;display:flex;gap:13px}
+.reco .num{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;color:var(--teal);
+  border:1.5px solid var(--teal);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;
+  justify-content:center;flex:none}
+.reco .vlab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.reco h4{margin:3px 0 4px;font-size:13.5px}
+.reco p{margin:0;font-size:12.5px;color:#3b3f48;line-height:1.45}
 
-  .barrier-callout { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
-  @media (max-width: 700px) { .barrier-callout { grid-template-columns: 1fr; } }
-  .barrier-block { border-radius: 8px; padding: 16px 18px; border: 1px solid; }
-  .barrier-block.primary   { background: rgba(252,92,101,0.07); border-color: rgba(252,92,101,0.3); }
-  .barrier-block.secondary { background: rgba(247,183,49,0.07); border-color: rgba(247,183,49,0.25); }
-  .barrier-rank { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .barrier-block.primary   .barrier-rank { color: var(--danger); }
-  .barrier-block.secondary .barrier-rank { color: var(--warn); }
-  .barrier-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-  .barrier-why  { font-size: 12px; color: var(--muted); line-height: 1.55; }
+.compare{width:100%;border-collapse:collapse;margin-top:4px;font-size:13px}
+.compare th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line)}
+.compare td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.compare td.who{font-weight:650}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+.pill.up{background:#0E7C661a;color:var(--teal)} .pill.dn{background:#C2410C1a;color:var(--clay)}
+.pill.fl{background:#64748b1a;color:var(--slate)}
 
-  .pillar-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-top: 16px; }
-  @media (max-width: 1000px) { .pillar-grid { grid-template-columns: repeat(3,1fr); } }
-  @media (max-width: 600px)  { .pillar-grid { grid-template-columns: 1fr 1fr; } }
-  .pillar-card { border-radius: 8px; padding: 14px; border: 1px solid transparent; }
-  .pillar-card.ok     { background: rgba(38,222,129,0.07);  border-color: rgba(38,222,129,0.2); }
-  .pillar-card.warn   { background: rgba(247,183,49,0.07);  border-color: rgba(247,183,49,0.22); }
-  .pillar-card.danger { background: rgba(252,92,101,0.07);  border-color: rgba(252,92,101,0.28); }
-  .pillar-icon   { font-size: 20px; margin-bottom: 8px; }
-  .pillar-name   { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-  .pillar-card.ok     .pillar-name { color: var(--ok); }
-  .pillar-card.warn   .pillar-name { color: var(--warn); }
-  .pillar-card.danger .pillar-name { color: var(--danger); }
-  .pillar-status { font-size: 12px; color: var(--muted); }
-  .pillar-reco   { font-size: 11px; margin-top: 8px; padding: 7px 9px; border-radius: 5px; background: rgba(0,0,0,0.22); line-height: 1.5; color: var(--muted); }
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);font-size:11.5px}
+@media(max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .eras-strip{grid-template-columns:1fr 1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .vectors{grid-template-columns:1fr 1fr}
+  .recos{grid-template-columns:1fr}
+  .era-card .lbl{min-height:0}
 
-  .exception-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 4px; }
-  @media (max-width: 700px) { .exception-cards { grid-template-columns: 1fr; } }
-  .exception-card { background: var(--surface2); border-radius: 8px; padding: 14px; border: 1px solid var(--border); }
-  .exc-trigger { font-size: 12px; font-weight: 700; color: var(--accent2); margin-bottom: 4px; }
-  .exc-desc    { font-size: 12px; color: var(--muted); }
-  .exc-cat     { font-size: 11px; color: var(--accent); margin-top: 6px; }
+  /* Header */
+  header.top h1{font-size:20px}
+  header.top p.sub{font-size:12px}
+  .wrap{padding:0 14px}
 
-  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  /* Nav tabs scroll — ensure first tab visible */
+  nav.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-padding-left:14px}
+  nav.tabs button{min-width:110px;font-size:11px;padding:12px 10px;flex-shrink:0;text-align:left}
+  nav.tabs button .n{font-size:9px}
 
-  .tip-box { background: rgba(124,106,247,0.07); border: 1px solid rgba(124,106,247,0.2); border-radius: 8px; padding: 12px 16px; font-size: 12px; color: var(--muted); margin-top: 16px; }
-  .tip-box strong { color: var(--accent); }
+  /* Compare table — reduce min-width so it fits single col on mobile */
+  .compare-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .compare{min-width:320px;font-size:12px}
+  .compare th,.compare td{padding:7px 8px}
 
-  .context-bar { background: var(--surface2); border-radius: 8px; padding: 14px 18px; display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
-  .ctx-item { display: flex; flex-direction: column; gap: 2px; }
-  .ctx-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
-  .ctx-val   { font-size: 13px; font-weight: 600; }
+@media(prefers-color-scheme:dark){
+  html,body{background:#F2F4F7 !important;color:#15171C !important}
+  .card{background:#FFFFFF !important;color:#15171C !important}
+  header.top{background:#15171C !important}
+}
 
-  .brand-compare { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 4px; }
-  @media (max-width: 800px) { .brand-compare { grid-template-columns: 1fr; } }
-  .brand-card { background: var(--surface2); border-radius: 8px; padding: 16px; border: 1px solid var(--border); }
-  .brand-card.leader { border-color: rgba(124,106,247,0.4); }
-  .brand-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .brand-name { font-size: 14px; font-weight: 700; }
-  .brand-pos.leader     { font-size: 11px; font-weight: 600; color: var(--ok); }
-  .brand-pos.challenger { font-size: 11px; font-weight: 600; color: var(--warn); }
-  .brand-pos.niche      { font-size: 11px; font-weight: 600; color: var(--muted); }
-  .dim-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-  .dim-label { font-size: 11px; color: var(--muted); width: 130px; flex-shrink: 0; }
-  .dim-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
-  .dim-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--accent),var(--accent2)); }
-  .dim-score { font-size: 11px; font-weight: 700; width: 16px; text-align: right; color: var(--muted); }
-  .total-score { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; align-items: center; }
-  .total-val { font-weight: 800; font-size: 15px; color: var(--accent); }
+  /* Vec grid */
+  .vecgrid{grid-template-columns:1fr 1fr}
 
-  .principle-row { display: grid; grid-template-columns: 210px 1fr 52px; gap: 0; align-items: center; border-bottom: 1px solid var(--border); padding: 14px 0; }
-  .principle-row:last-child { border-bottom: none; }
-  .principle-num  { font-size: 22px; font-weight: 800; color: var(--accent); opacity: 0.35; display: inline; margin-right: 8px; }
-  .principle-name { font-size: 13px; font-weight: 700; display: inline; }
-  .principle-desc { font-size: 12px; color: var(--muted); padding: 0 20px; }
-  .score-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; margin-left: auto; }
-  .sc-danger { background: rgba(252,92,101,0.15); color: var(--danger); }
-  .sc-warn   { background: rgba(247,183,49,0.15);  color: var(--warn); }
-  .sc-ok     { background: rgba(38,222,129,0.15);  color: var(--ok); }
-
-  .gap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .gap-table th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-  .gap-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .gap-table tr:last-child td { border-bottom: none; }
-  .gap-table tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .gap-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-  @media (max-width: 680px) {
-    /* Header */
-    .header { padding: 14px 16px; gap: 10px; }
-    .header-badge { display: none; }
-    .header-title { font-size: 14px; }
-    .header-sub { font-size: 11px; }
-
-    /* Tabs scroll */
-    .tabs { padding: 0 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 0; }
-    .tab { padding: 12px 14px; font-size: 12px; white-space: nowrap; }
-
-    /* Main padding */
-    .main { padding: 16px 16px 72px; }
-
-    /* Controls stack — remove any inherited indent */
-    .control-row { flex-direction: column; gap: 14px; padding: 0; align-items: flex-start; }
-    .control-group { padding: 0; width: 100%; }
-    .control-group label { text-align: left; padding: 0; margin: 0; display: block; }
-    .toggle-group { flex-wrap: wrap; }
-
-    /* Sulit bar label */
-    .sulit-label { width: 120px; font-size: 11px; }
-
-    /* Profile stats */
-    .profile-row { gap: 8px; }
-    .profile-stat { min-width: unset; flex: 1; padding: 10px 12px; }
-
-    /* Principle row reflow */
-    .principle-row { grid-template-columns: 1fr; gap: 6px; }
-    .principle-desc { padding: 0; }
-    .score-circle { margin-left: 0; }
-
-    /* Gap table scroll */
-    .gap-table-wrap { overflow-x: auto; }
-    .gap-table { min-width: 480px; }
-
-    /* Context bar */
-    .context-bar { gap: 12px; padding: 12px; }
-
-    /* Footer — add bottom padding so portfolio button doesn't overlap */
-    .footer { padding: 16px 16px 60px; }
-  }
+  /* Main and footer bottom padding for portfolio button */
+  main{padding-bottom:80px}
+  footer{padding-bottom:64px}
+}
 </style>
 </head>
 <body>
-<a href="https://leilaeuniceclemente.github.io" style="position:fixed;bottom:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(26,29,39,0.92);backdrop-filter:blur(8px);border:1px solid rgba(124,106,247,0.4);border-radius:6px;font-size:12px;font-weight:600;color:rgba(232,234,240,0.7);text-decoration:none;font-family:system-ui,sans-serif;" onmouseover="this.style.color='#7c6af7';this.style.borderColor='#7c6af7'" onmouseout="this.style.color='rgba(232,234,240,0.7)';this.style.borderColor='rgba(124,106,247,0.4)'">← Portfolio</a>
+<a href="https://leilaeuniceclemente.github.io" style="position:fixed;bottom:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(21,23,28,0.92);backdrop-filter:blur(8px);border:1px solid rgba(14,124,102,0.4);border-radius:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.7);text-decoration:none;font-family:system-ui,sans-serif;" onmouseover="this.style.color='#5EAD9B';this.style.borderColor='#5EAD9B'" onmouseout="this.style.color='rgba(255,255,255,0.7)';this.style.borderColor='rgba(14,124,102,0.4)'">← Portfolio</a>
+<header class="top"><div class="wrap">
+  <div class="eyebrow">P20Y Category Growth &middot; Decomposition Instrument</div>
+  <h1>Category Growth Codification Console</h1>
+  <p class="sub">Twenty years of an FMCG category, decomposed into growth eras, the volume/price/mix that built them, the demand vectors behind them, and where the landscape leaves the leader now. Synthetic illustrative data.</p>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-t="0"><span class="n">01 · WHAT HAPPENED</span>Category Growth</button>
+    <button role="tab" aria-selected="false" data-t="1"><span class="n">02 · WHY IT WON</span>Growth Vectors</button>
+    <button role="tab" aria-selected="false" data-t="2"><span class="n">03 · WHO WON</span>Share &amp; Contribution</button>
+    <button role="tab" aria-selected="false" data-t="3"><span class="n">04 · SO WHAT</span>Now &amp; Outlook</button>
+  </nav>
+</div></header>
 
-<div class="header">
-  <div class="header-icon">📦</div>
-  <div>
-    <div class="header-title">Upsizing Decision Console</div>
-    <div class="header-sub">Consumer barrier mapping & growth playbook · Philippine FMCG · Synthetic data</div>
-  </div>
-  <div class="header-badge">Synthetic · noindex</div>
-</div>
-
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('consumer')">Consumer Barrier Scan</div>
-  <div class="tab" onclick="switchTab('playbook')">Growth Playbook</div>
-</div>
-
-<div class="main">
+<main class="wrap">
+  <!-- TAB 0 -->
+  <section class="panelpage active" id="p0">
+    <p class="lead">The category grew <b id="mult"></b> in volume over twenty years, but not evenly. Four eras tell different stories &mdash; and the volume/price/mix split reveals which growth was real demand versus inflation.</p>
+    <div class="eras-strip" id="eraStrip"></div>
+    <div class="grid">
+      <div class="card full"><h3>Category trajectory &amp; growth eras</h3><p class="cap">Indexed to base year = 100. Volume vs value.</p><div id="c_traj"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--teal)"></i>Volume index</span><span><i class="ln" style="background:var(--indigo)"></i>Value index</span></div></div>
+      <div class="card"><h3>Volume / price / mix by era</h3><p class="cap">Points of value CAGR. Bars sum to the era's value growth; the marker is total value CAGR.</p><div id="c_vpm"></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Volume</span><span><i style="background:var(--slate)"></i>Price</span><span><i style="background:var(--indigo)"></i>Mix</span><span><i style="background:var(--ink)"></i>Value CAGR</span></div></div>
+      <div class="card"><h3>Pricing vs inflation</h3><p class="cap">Category price index against CPI. Gap below CPI = real accessibility.</p><div id="c_infl"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--clay)"></i>Category price</span><span><i class="ln" style="background:var(--muted)"></i>CPI</span></div></div>
+    </div>
+    <div class="callout"><span class="k">Read</span><p id="read0"></p></div>
+  </section>
 
   <!-- TAB 1 -->
-  <div class="panel active" id="panel-consumer">
-    <div class="control-row">
-      <div class="control-group">
-        <label>Shopper Segment</label>
-        <div class="toggle-group" id="seg-grp">
-          <button class="toggle active" onclick="setSeg('daily',this)">Daily Wage</button>
-          <button class="toggle" onclick="setSeg('semi',this)">Semi-Monthly</button>
-          <button class="toggle" onclick="setSeg('monthly',this)">Monthly</button>
-        </div>
-      </div>
-      <div class="control-group">
-        <label>Category</label>
-        <div class="toggle-group" id="cat-grp">
-          <button class="toggle active" onclick="setCat('cat1',this)">Category A</button>
-          <button class="toggle" onclick="setCat('cat2',this)">Category B</button>
-          <button class="toggle" onclick="setCat('cat3',this)">Category C</button>
-          <button class="toggle" onclick="setCat('cat4',this)">Category D</button>
-        </div>
-      </div>
+  <section class="panelpage" id="p1">
+    <p class="lead">High-growth eras were <b>volume-led</b>, and that volume came from <b>penetration &mdash; new category users</b> &mdash; not from existing buyers spending more. Penetration was won by five vectors firing together.</p>
+    <div class="grid">
+      <div class="card"><h3>Demand driver tree</h3><p class="cap">Penetration, consumption per buyer, premiumization. Indexed to base = 100.</p><div id="c_drv"></div>
+        <div class="legend"><span><i class="ln" style="background:var(--teal)"></i>Penetration</span><span><i class="ln" style="background:var(--indigo)"></i>Consumption/buyer</span><span><i class="ln" style="background:var(--gold)"></i>Premiumization</span></div></div>
+      <div class="card"><h3>Tier &times; pack mix shift</h3><p class="cap">Value share of the four cells over time.</p><div id="c_mix"></div>
+        <div class="legend" id="mixleg"></div></div>
     </div>
-
-    <div class="card">
-      <div class="section-label">Shopper Profile</div>
-      <div class="profile-row" id="profile-stats"></div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <div class="section-label">The "Sulit" Test — Is this big pack worth it?</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">
-        Shoppers evaluate big packs against two conditions simultaneously. Both must pass for a purchase to feel <strong style="color:var(--text)">sulit</strong> (genuinely worth the money).
-      </div>
-      <div id="sulit-meter"></div>
-      <div id="sulit-verdict"></div>
-    </div>
-
-    <div style="margin-top:16px">
-      <div class="section-label">Category Barriers — What's stopping the switch</div>
-      <div class="barrier-callout" id="barrier-callout"></div>
-    </div>
-
-    <div class="card">
-      <div style="display:flex;gap:12px;margin-bottom:14px;font-size:12px;flex-wrap:wrap;align-items:center;">
-        <span style="color:var(--muted)">Pillars by phase:</span>
-        <span style="background:rgba(124,106,247,0.15);color:var(--accent);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;">Drive Trial → Price Point · Value Comms</span>
-        <span style="background:rgba(78,205,196,0.15);color:var(--accent2);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;">Drive Repeat → Dosage · Mileage · Convenience</span>
-      </div>
-      <div class="pillar-grid" id="pillar-grid"></div>
-    </div>
-
-    <hr class="divider">
-
-    <div class="section-label">When shoppers override the small-pack default</div>
-    <div class="exception-cards" id="exception-cards"></div>
-
-    <div class="tip-box">
-      <strong>Key finding:</strong> ~60% of shopping trips at the trade-up price point still end in small-pack purchases.
-      Fixing the #1 barrier per category unlocks the largest conversion opportunity — but driving repeat requires all three
-      Repeat pillars to clear, especially dosage guidance in categories where consumers have no reliable sensory cue for correct usage.
-    </div>
-  </div>
+    <div style="margin:6px 0 12px"><h3 style="margin:0 0 3px;font-size:15px">How each vector moved &mdash; and how differently, era to era</h3>
+      <p class="cap" style="font-size:12.5px">The actual in-process metric behind each vector across twenty years. Era bands carry each era's rate of change, so you see the shift in what was being done, not just the result. E2's band is tinted.</p></div>
+    <div class="grid" id="vectors"></div>
+    <div class="grid"><div class="card full"><h3>Comms vector &middot; benefit-space map</h3><p class="cap">The fifth vector, in process: share of media weight by benefit space, by year. Concentrated on one conversion message through E2, fragmented across spaces after.</p><div id="c_media"></div>
+      <div class="legend" id="medleg"></div></div></div>
+    <div class="callout"><span class="k">Read</span><p id="read1"></p></div>
+  </section>
 
   <!-- TAB 2 -->
-  <div class="panel" id="panel-playbook">
-    <div class="control-row">
-      <div class="control-group">
-        <label>Category</label>
-        <div class="toggle-group" id="play-cat-grp">
-          <button class="toggle active" onclick="setPlayCat('cat1',this)">Category A</button>
-          <button class="toggle" onclick="setPlayCat('cat2',this)">Category B</button>
-          <button class="toggle" onclick="setPlayCat('cat3',this)">Category C</button>
-          <button class="toggle" onclick="setPlayCat('cat4',this)">Category D</button>
-        </div>
-      </div>
+  <section class="panelpage" id="p2">
+    <p class="lead">The leader <b>Auria</b> didn't just ride the category &mdash; it drove a disproportionate share of growth, pulling share from <b>46% to a 66% peak</b>. Then the curve turned.</p>
+    <div class="grid">
+      <div class="card full"><h3>Manufacturer value share</h3><p class="cap">Annual value share, four players.</p><div id="c_share"></div>
+        <div class="legend" id="brleg"></div></div>
+      <div class="card full"><h3>Contribution to growth vs fair share</h3><p class="cap">By era: Auria's share of category growth (bar) against its average market share (marker). Above the marker = winning more than its fair share.</p><div id="c_fair"></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Contribution to growth</span><span><i style="background:var(--ink)"></i>Avg market share (fair share)</span></div></div>
     </div>
+    <div class="callout"><span class="k">Read</span><p id="read2"></p></div>
+  </section>
 
-    <div class="context-bar" id="play-context"></div>
-
-    <div class="section-label">Brand Upsizing Scorecard (Synthetic)</div>
-    <div class="brand-compare" id="brand-compare"></div>
-
-    <hr class="divider">
-
-    <div class="section-label">The 5 Growth Principles</div>
-    <div class="card" id="principles-detail"></div>
-
-    <div style="margin-top:16px">
-      <div class="section-label">Priority Gap — Leader vs. Category Average</div>
-      <div class="card">
-        <div class="gap-table-wrap">
-        <table class="gap-table">
-          <thead>
-            <tr>
-              <th>Principle</th><th>Leader</th><th>Cat. Avg</th><th>Gap</th><th>Priority</th>
-            </tr>
-          </thead>
-          <tbody id="gap-tbody"></tbody>
-        </table>
-        </div>
-      </div>
+  <!-- TAB 3 -->
+  <section class="panelpage" id="p3">
+    <p class="lead">Today the engine that built the category &mdash; penetration of the core tier &mdash; has <b>saturated</b>. Growth has cooled to low single digits, buyers are down-tiering, and the value entrant is back. Here's the contrast and what to do.</p>
+    <div class="kpis" id="nowkpis"></div>
+    <div class="grid">
+      <div class="card"><h3>What changed</h3><p class="cap">The vectors that won, now turning.</p>
+        <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;color:#3b3f48;line-height:1.7" id="changed"></ul></div>
+      <div class="card"><h3>Competitive read &mdash; now</h3><p class="cap">Where each player is pressing.</p>
+        <div class="compare-wrap"><table class="compare"><thead><tr><th>Player</th><th>Move</th><th>Trajectory</th></tr></thead><tbody id="comprows"></tbody></table></div></div>
     </div>
+    <div class="card full" style="margin-bottom:16px"><h3>Recommendations to stay competitive</h3><p class="cap">Mapped to the five vectors, anchored to where the data turned.</p>
+      <div class="recos" id="recos"></div></div>
+    <div class="callout warn"><span class="k">Bottom line</span><p id="read3"></p></div>
+  </section>
+</main>
 
-    <div class="tip-box" id="play-tip"></div>
-  </div>
-
-</div>
-
-<div class="footer">
-  Synthetic data · All brand names, category names, and scores are illustrative · No proprietary or confidential data included
-</div>
+<footer class="wrap">Synthetic, illustrative dataset &mdash; no real brand, category, or figure. Built as a portfolio demonstration of category-growth decomposition. Tier (Base/Premium) &times; pack (Small/Big), four manufacturers, twenty years.</footer>
 
 <script>
-const DATA = {"segments": [{"id": "daily", "label": "Daily Wage Earner", "pct": 26, "budget_range": "₱50–₱99", "payday_cycle": "Daily", "sari_sari_reliance": "High", "upsizing_readiness": "Low"}, {"id": "semi", "label": "Semi-Monthly Earner", "pct": 44, "budget_range": "₱100–₱199", "payday_cycle": "14 days", "sari_sari_reliance": "Medium", "upsizing_readiness": "High"}, {"id": "monthly", "label": "Monthly Earner", "pct": 30, "budget_range": "₱150–₱249", "payday_cycle": "30 days", "sari_sari_reliance": "Low", "upsizing_readiness": "High"}], "categories": [{"id": "cat1", "label": "Category A", "small_format": "small pack", "big_format": "bulk pack", "small_share": 70, "barrier_1": "Dosage guidance", "barrier_1_why": "Shoppers rely on a familiar visual cue to judge when they've used enough — but this cue only confirms they haven't used too little. There is no corresponding signal for overdosing. With no upper limit, consumption runs roughly twice the intended amount, cutting expected pack duration in half.", "barrier_2": "Pack duration to next payday", "barrier_2_why": "When the bulk pack runs out before next payday, shoppers top up with small packs from a nearby store at a higher per-unit cost. This experience makes the big pack feel more expensive in hindsight, even when the economics favor it.", "exception_note": "Shoppers who receive explicit dosing guidance — via pack markings or in-home demonstration — show significantly higher repeat rates.", "barriers": {"price_point": 2, "value_comms": 0, "dosage": 0, "mileage": 0, "convenience": 1}}, {"id": "cat2", "label": "Category B", "small_format": "small pack", "big_format": "large-format pack", "small_share": 60, "barrier_1": "Storage and handling convenience", "barrier_1_why": "Large-format packs without secured closures are prone to tipping in cramped home storage areas. A single spill wastes a meaningful portion of the pack and removes the value-for-money rationale, prompting shoppers to return to small packs permanently.", "barrier_2": "Dosage guidance", "barrier_2_why": "Shoppers add product until a familiar sensory signal appears during use — but this signal only confirms underdosing, not correct dosing. There is no corresponding cue for overdosing, so actual consumption runs 40–60% above intended levels.", "exception_note": "Packs with resealable closures see meaningfully higher repeat. The closure resolves the #1 barrier before the shopper encounters it.", "barriers": {"price_point": 2, "value_comms": 0, "dosage": 0, "mileage": 1, "convenience": 0}}, {"id": "cat3", "label": "Category C", "small_format": "small pack", "big_format": "standard or premium format", "small_share": 55, "barrier_1": "Entry price point", "barrier_1_why": "The premium big-pack format is priced above the range where the vast majority of shopping trips occur. Fewer than 5% of trips are at that price tier, meaning most shoppers auto-reject the upgrade at shelf without comparing value.", "barrier_2": "Value communication", "barrier_2_why": "Shoppers who have tried the standard big-pack format report it ran out faster than expected. Without a clear on-pack claim quantifying how many small packs it replaces, the value proposition is invisible — and a single poor experience is hard to reverse.", "exception_note": "Standard big-pack formats at accessible price points see stronger trial. A secondary premium tier can coexist once the entry format builds the habit.", "barriers": {"price_point": 0, "value_comms": 0, "dosage": 1, "mileage": 0, "convenience": 1}}, {"id": "cat4", "label": "Category D", "small_format": "single unit", "big_format": "bundle pack", "small_share": 45, "barrier_1": "Value communication", "barrier_1_why": "Most shoppers already know bundle packs last longer — the mileage case is intuitive. The barrier is legibility: the per-unit savings aren't visible enough at a glance, so shoppers anchor on the higher total price and default to the single unit out of habit.", "barrier_2": "Upfront price perception", "barrier_2_why": "Even when the per-unit math favors the bundle, the total sticker price reads as a larger outlay than a single unit. Shoppers who could afford the bundle still choose singles because the upfront number feels larger.", "exception_note": "Brands that make the peso savings legible in under two seconds at shelf — through absolute amount callouts rather than percentage discounts — convert significantly more first-time bundle buyers.", "barriers": {"price_point": 0, "value_comms": 0, "dosage": 2, "mileage": 2, "convenience": 2}}], "exceptions": [{"trigger": "Convenience advantage", "description": "The big pack avoids spillage, storage mess, or handling friction that the small pack creates — the format itself removes a friction point.", "example_category": "Liquid categories with small sachet variants"}, {"trigger": "Small visible price gap", "description": "When the step-up price feels small relative to the extra volume, shoppers anchor on the quantity gain rather than the peso outlay.", "example_category": "Categories with multipack vs. single-unit pricing"}, {"trigger": "Low small-pack availability nearby", "description": "When neighborhood stores don't reliably stock the small format, shoppers pre-stock the large size at a supermarket rather than risk running out.", "example_category": "Categories where sari-sari stocking is thin"}], "growth_principles": [{"id": "portfolio", "label": "Portfolio Coverage", "description": "Big packs present at the price points where most shopping trips occur. In most categories, 60–70% of trips fall in the ₱50–₱199 band — brands without an entry pack here are invisible to the majority of shoppers."}, {"id": "pack_comms", "label": "Pack Communication", "description": "On-pack claims show absolute savings vs. small packs AND how many uses the big pack delivers (e.g. 'More than 30 small packs'). Distinctive pack names — 'Value Pack', 'Family Size' — help shoppers anchor the bigger size as a different, intentional choice."}, {"id": "pricing", "label": "Price per Unit Advantage", "description": "Big pack price-per-unit must be meaningfully lower than the small pack equivalent. Brands offering ≥10% savings per unit grow faster; those offering <5% see weak conversion even with high shelf presence."}, {"id": "distribution", "label": "Shelf Availability", "description": "Winning brands expand big pack store coverage faster than small pack coverage. Where small packs plateau, leaders actively push big packs into more outlets — making them findable before the shopper reverts to the familiar small format."}, {"id": "atl_btl", "label": "Media & In-Store Alignment", "description": "Brands that show the same hero SKU across advertising and shelf grow faster. When a shopper sees a big pack in media but can't find it in-store — or signage shows a different pack — the conversion chain breaks."}], "brands": [{"brand": "Brand A", "category_id": "cat1", "category_label": "Category A", "portfolio": 4, "pack_comms": 3, "pricing": 4, "distribution": 4, "atl_btl": 3, "total": 18, "market_position": "Leader"}, {"brand": "Brand B", "category_id": "cat1", "category_label": "Category A", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 3, "atl_btl": 1, "total": 9, "market_position": "Challenger"}, {"brand": "Brand C", "category_id": "cat1", "category_label": "Category A", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 2, "atl_btl": 1, "total": 8, "market_position": "Niche"}, {"brand": "Brand A", "category_id": "cat2", "category_label": "Category B", "portfolio": 4, "pack_comms": 4, "pricing": 3, "distribution": 5, "atl_btl": 5, "total": 21, "market_position": "Leader"}, {"brand": "Brand B", "category_id": "cat2", "category_label": "Category B", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 3, "atl_btl": 1, "total": 9, "market_position": "Challenger"}, {"brand": "Brand C", "category_id": "cat2", "category_label": "Category B", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 2, "atl_btl": 1, "total": 8, "market_position": "Niche"}, {"brand": "Brand A", "category_id": "cat3", "category_label": "Category C", "portfolio": 5, "pack_comms": 3, "pricing": 4, "distribution": 5, "atl_btl": 5, "total": 22, "market_position": "Leader"}, {"brand": "Brand B", "category_id": "cat3", "category_label": "Category C", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 3, "atl_btl": 1, "total": 9, "market_position": "Challenger"}, {"brand": "Brand C", "category_id": "cat3", "category_label": "Category C", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 2, "atl_btl": 1, "total": 8, "market_position": "Niche"}, {"brand": "Brand A", "category_id": "cat4", "category_label": "Category D", "portfolio": 4, "pack_comms": 3, "pricing": 4, "distribution": 4, "atl_btl": 3, "total": 18, "market_position": "Leader"}, {"brand": "Brand B", "category_id": "cat4", "category_label": "Category D", "portfolio": 2, "pack_comms": 1, "pricing": 4, "distribution": 3, "atl_btl": 1, "total": 11, "market_position": "Challenger"}, {"brand": "Brand C", "category_id": "cat4", "category_label": "Category D", "portfolio": 2, "pack_comms": 1, "pricing": 2, "distribution": 2, "atl_btl": 1, "total": 8, "market_position": "Niche"}]};
+const D = {"years": [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], "gyears": [2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022], "category": {"units": [1000.0, 1040.01, 1071.21, 1114.05, 1169.75, 1216.53, 1253.04, 1453.53, 1657.01, 1938.71, 2190.74, 2519.35, 2922.45, 3331.59, 3664.75, 3957.93, 4314.13, 4529.85, 4393.95, 4569.71, 4706.81], "value": [11050.0, 11887.0, 12665.0, 13624.0, 14797.0, 15918.0, 16959.0, 19941.0, 23044.0, 27330.0, 31306.0, 36494.0, 42912.0, 49588.0, 57089.0, 64529.0, 73614.0, 80736.0, 81800.0, 88860.0, 95601.0], "value_index": [100.0, 107.6, 114.6, 123.3, 133.9, 144.1, 153.5, 180.5, 208.5, 247.3, 283.3, 330.3, 388.3, 448.8, 516.6, 584.0, 666.2, 730.6, 740.3, 804.2, 865.2], "vol_index": [100.0, 104.0, 107.1, 111.4, 117.0, 121.7, 125.3, 145.4, 165.7, 193.9, 219.1, 251.9, 292.2, 333.2, 366.5, 395.8, 431.4, 453.0, 439.4, 457.0, 470.7], "price_index": [100.0, 103.44, 106.99, 110.67, 114.48, 118.41, 122.48, 124.16, 125.86, 127.58, 129.32, 131.09, 132.88, 134.7, 140.98, 147.54, 154.42, 161.29, 168.48, 175.98, 183.81], "cpi_index": [100.0, 104.0, 108.2, 112.5, 117.0, 121.7, 126.5, 130.3, 134.2, 138.3, 142.4, 146.7, 151.1, 155.6, 161.8, 168.3, 175.0, 182.0, 189.3, 196.9, 204.8], "units_mult": 4.7}, "cells": {"order": ["BS", "BB", "PS", "PB"], "label": {"BS": "Base \u00b7 Small", "BB": "Base \u00b7 Big", "PS": "Premium \u00b7 Small", "PB": "Premium \u00b7 Big"}, "vshare": {"BS": [49.77, 49.35, 48.93, 48.5, 48.08, 47.66, 47.23, 47.03, 46.83, 46.63, 46.43, 46.23, 46.03, 45.83, 43.93, 42.03, 40.15, 40.85, 41.55, 42.26, 42.96], "BB": [13.03, 13.28, 13.53, 13.78, 14.03, 14.28, 14.53, 14.76, 14.99, 15.21, 15.44, 15.67, 15.9, 16.13, 16.6, 17.06, 17.52, 17.16, 16.8, 16.45, 16.09], "PS": [28.96, 28.74, 28.51, 28.29, 28.06, 27.84, 27.61, 27.23, 26.85, 26.47, 26.09, 25.7, 25.32, 24.93, 24.41, 23.88, 23.36, 23.0, 22.65, 22.29, 21.94], "PB": [8.24, 8.63, 9.03, 9.43, 9.83, 10.23, 10.63, 10.98, 11.33, 11.68, 12.04, 12.39, 12.75, 13.11, 15.07, 17.03, 18.98, 18.99, 19.0, 19.0, 19.01]}}, "brands": {"order": ["Auria", "Nello", "Pavo", "Mercato PL"], "share": {"Auria": [46.0, 45.67, 45.33, 45.0, 44.67, 44.33, 44.0, 46.57, 49.14, 51.71, 54.29, 56.86, 59.43, 62.0, 63.33, 64.67, 66.0, 64.25, 62.5, 60.75, 59.0], "Nello": [24.0, 24.17, 24.33, 24.5, 24.67, 24.83, 25.0, 24.0, 23.0, 22.0, 21.0, 20.0, 19.0, 18.0, 17.33, 16.67, 16.0, 16.25, 16.5, 16.75, 17.0], "Pavo": [12.0, 12.17, 12.33, 12.5, 12.67, 12.83, 13.0, 12.86, 12.71, 12.57, 12.43, 12.29, 12.14, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0, 12.0], "Mercato PL": [18.0, 18.0, 18.0, 18.0, 18.0, 18.0, 18.0, 16.57, 15.14, 13.71, 12.29, 10.86, 9.43, 8.0, 7.33, 6.67, 6.0, 7.5, 9.0, 10.5, 12.0]}}, "drivers": {"penetration": [100.0, 101.3, 102.7, 104.0, 105.3, 106.7, 108.0, 114.0, 120.0, 126.0, 132.0, 138.0, 144.0, 150.0, 152.7, 155.3, 158.0, 156.5, 155.0, 153.5, 152.0], "consumption": [100.0, 100.5, 101.0, 101.5, 102.0, 102.5, 103.0, 105.1, 107.3, 109.4, 111.6, 113.7, 115.9, 118.0, 122.0, 126.0, 130.0, 129.5, 129.0, 128.5, 128.0], "premiumization": [100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 106.9, 107.7, 108.6, 109.4, 110.3, 111.1, 112.0, 121.3, 130.7, 140.0, 139.5, 139.0, 138.5, 138.0]}, "media": {"benefits": ["Value & Longevity", "Everyday Performance", "Hygiene & Protection", "Premium Care", "Smart Value"], "share": {"Value & Longevity": [35, 35, 35, 35, 35, 35, 50, 50, 50, 50, 50, 50, 50, 25, 25, 25, 18, 18, 18, 18], "Everyday Performance": [40, 40, 40, 40, 40, 40, 25, 25, 25, 25, 25, 25, 25, 20, 20, 20, 17, 17, 17, 17], "Hygiene & Protection": [15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 22, 22, 22, 22], "Premium Care": [5, 5, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 35, 35, 35, 23, 23, 23, 23], "Smart Value": [5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 20, 20, 20, 20]}, "grp_total": [11000, 12000, 13000, 14000, 16000, 18000, 24000, 30000, 38000, 42000, 46000, 52000, 55000, 58000, 60000, 50000, 48000, 38000, 42000, 40000]}, "distribution": {"nd": [48.0, 49.2, 50.3, 51.5, 52.7, 53.8, 55.0, 58.3, 61.6, 64.9, 68.1, 71.4, 74.7, 78.0, 80.0, 82.0, 84.0, 83.0, 82.0, 81.0, 80.0], "tdp": [100.0, 103.3, 106.7, 110.0, 113.3, 116.7, 120.0, 132.9, 145.7, 158.6, 171.4, 184.3, 197.1, 210.0, 220.0, 230.0, 240.0, 236.2, 232.5, 228.8, 225.0]}, "vpm": [{"era": "E1", "label": "Stable Base Growth", "start": 2003, "end": 2008, "value_cagr": 7.4, "volume_cagr": 3.83, "volume_pts": 3.5, "price_pts": 3.96, "mix_pts": -0.06, "price_growth": 3.44, "cpi_growth": 4.0, "price_vs_inflation": -0.56}, {"era": "E2", "label": "Penetration Explosion", "start": 2009, "end": 2015, "value_cagr": 16.57, "volume_cagr": 14.99, "volume_pts": 14.28, "price_pts": 2.49, "mix_pts": -0.21, "price_growth": 1.37, "cpi_growth": 3.0, "price_vs_inflation": -1.63}, {"era": "E3", "label": "Premiumization & Big Pack", "start": 2016, "end": 2018, "value_cagr": 14.08, "volume_cagr": 9.0, "volume_pts": 8.57, "price_pts": 5.33, "mix_pts": 0.17, "price_growth": 4.66, "cpi_growth": 4.0, "price_vs_inflation": 0.66}, {"era": "E4", "label": "Saturation & Competitive Shift", "start": 2019, "end": 2022, "value_cagr": 6.75, "volume_cagr": 2.2, "volume_pts": 2.06, "price_pts": 4.74, "mix_pts": -0.04, "price_growth": 4.45, "cpi_growth": 4.0, "price_vs_inflation": 0.45}], "eras": [{"era": "E1", "start": 2003, "end": 2008, "label": "Stable Base Growth"}, {"era": "E2", "start": 2009, "end": 2015, "label": "Penetration Explosion"}, {"era": "E3", "start": 2016, "end": 2018, "label": "Premiumization & Big Pack"}, {"era": "E4", "start": 2019, "end": 2022, "label": "Saturation & Competitive Shift"}], "era_fair": [{"era": "E1", "label": "Stable Base Growth", "contrib": 40.3, "share": 44.8, "gap": -4.5}, {"era": "E2", "label": "Penetration Explosion", "contrib": 71.4, "share": 54.3, "gap": 17.1}, {"era": "E3", "label": "Premiumization & Big Pack", "contrib": 74.3, "share": 64.7, "gap": 9.6}, {"era": "E4", "label": "Saturation & Competitive Shift", "contrib": 35.6, "share": 61.6, "gap": -26.0}], "portfolio": [100.0, 101.3, 102.7, 104.0, 105.3, 106.7, 108.0, 116.1, 124.3, 132.4, 140.6, 148.7, 156.9, 165.0, 175.0, 185.0, 195.0, 195.8, 196.5, 197.2, 198.0], "skus": {"entry": [6, 6, 7, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 15, 16, 16, 16, 16, 16, 16], "premium": [3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 8, 10, 12, 12, 12, 12, 12]}, "vectors": {"portfolio": [1.3, 6.0, 5.6, 0.4], "media": [10.4, 14.8, -7.2, -5.9], "distribution": [3.0, 7.9, 4.4, -1.6], "comms": [35, 50, 25, 18], "pricing": [-0.56, -1.63, 0.66, 0.45]}};
+const C = {teal:'#0E7C66',tealL:'#5EAD9B',indigo:'#4338CA',indigoL:'#8E97E8',slate:'#64748B',clay:'#C2410C',gold:'#B45309',ink:'#15171C',muted:'#6B7280',line:'#E3E6EC'};
+const CELLCOL={BS:C.teal,BB:C.tealL,PS:C.indigo,PB:C.indigoL};
+const BRCOL={'Auria':C.teal,'Nello':C.slate,'Pavo':C.indigo,'Mercato PL':C.clay};
+const BENCOL=[C.teal,C.tealL,C.slate,C.indigo,C.clay];
+const Y=D.years, Y0=Y[0], Y1=Y[Y.length-1];
 
-const PILLAR_DEFS = [
-  {
-    id:"price_point", icon:"💰", label:"Price Point", phase:"trial",
-    generic:{
-      ok:     {status:"Big pack sits within the shopper's typical category budget", reco:"Maintain the entry price; monitor as costs shift to avoid drifting above the accessible range."},
-      warn:   {status:"Borderline — shoppers may hesitate at the price step-up", reco:"Use a promotional price to close the gap; communicate savings explicitly on-pack."},
-      danger: {status:"Price too far from budget — most shoppers auto-reject at shelf", reco:"Introduce an entry big pack priced near two weeks' worth of small packs, or run a sustained promo price to establish the habit."},
-    },
-    catOverride:{
-      cat3:{
-        ok:     {status:"Big pack sits in the price range where most trips occur", reco:"Protect this entry point; resist increases that push above the accessible band."},
-        warn:   {status:"Premium format priced above where most shopping trips occur", reco:"Explore a smaller entry format at an accessible price point to capture more trip occasions."},
-        danger: {status:"Premium format priced above the range of 95%+ of shopping trips — invisible to most shoppers", reco:"Launch an entry-tier format at the accessible price band; treat the premium format as an aspirational second tier."},
-      },
-      cat4:{
-        ok:     {status:"Bundle total price within shopper's reach", reco:"Focus on making the per-unit savings visible — the price fit is there but shoppers aren't seeing it."},
-        warn:   {status:"Bundle total price feels high despite per-unit savings", reco:"Consider a smaller starter bundle as a stepping stone; lower upfront commitment, same savings logic."},
-        danger: {status:"Bundle sticker price anchors high — shoppers default to single unit without comparing", reco:"Add a prominent 'Save ₱XX vs. buying singles' shelf callout; make the savings legible before the price registers."},
-      },
-    },
-  },
-  {
-    id:"value_comms", icon:"🏷️", label:"Value Comms", phase:"trial",
-    generic:{
-      ok:     {status:"On-pack clearly shows savings and how many uses the big pack delivers", reco:"Test absolute peso savings vs. percentage — absolute typically reads faster at shelf."},
-      warn:   {status:"Some comms exist but savings aren't immediately legible", reco:"Shift to absolute peso saved; add small-pack equivalent count prominently on front panel."},
-      danger: {status:"No mileage or savings claim — shopper can't justify the trade-up at a glance", reco:"Add 'Equivalent to X small packs' on the front panel; consider a distinctive name for the big format to make it feel like a separate, deliberate choice."},
-    },
-    catOverride:{
-      cat3:{
-        ok:     {status:"Big pack clearly communicates its small-pack equivalent", reco:"Reinforce the mileage claim in media to close the 'it runs out faster' perception gap."},
-        warn:   {status:"Pack has no small-pack count — shoppers don't know what they're getting", reco:"Add a small-pack equivalence claim prominently on the front panel."},
-        danger: {status:"No on-pack mileage claim — shoppers who misjudge pack duration on first use rarely come back", reco:"Equivalence count on front panel is the single highest-leverage fix; pair with a dosage marking inside the pack."},
-      },
-      cat4:{
-        ok:     {status:"Per-unit savings vs. single format clearly visible", reco:"Ensure the claim stays accurate as prices change; audit quarterly."},
-        warn:   {status:"Discount exists but isn't legible enough at a glance", reco:"Shift from percentage callout to absolute peso saved — peso savings reads faster."},
-        danger: {status:"Shopper sees a higher total price and stops there — per-unit savings are invisible without deliberate comparison", reco:"Make savings legible in 2 seconds: large peso amount on front, not a percentage. Add 'X units for the price of Y' framing."},
-      },
-    },
-  },
-  {
-    id:"dosage", icon:"🧪", label:"Dosage", phase:"repeat",
-    generic:{
-      ok:     {status:"Dosage is intuitive or physically guided", reco:"Maintain the dosage cue; reinforce via packaging."},
-      warn:   {status:"Some overdosing risk — guide present but not prominent", reco:"Move dosage marking to a more visible location; add a visual reference."},
-      danger: {status:"No dosage cue — consumers use product until a sensory signal appears, which indicates underdosing not overdosing", reco:"Add a physical measure (markings, measuring cap, or dose indicator) so shoppers have a clear stop point."},
-    },
-    catOverride:{
-      cat1:{
-        ok:     {status:"Shoppers correctly dose the big pack", reco:"Reinforce correct dosing via pack illustration; add a measuring tool if not already included."},
-        warn:   {status:"Shoppers use a sensory cue that signals underdosing — not a reliable upper limit", reco:"Add measurement markings and a simple dosing guide on the side panel."},
-        danger: {status:"The sensory cue shoppers rely on only indicates they haven't used too little — there's no signal for too much. Consumption runs roughly 2× intended, cutting pack duration in half.", reco:"Include a measuring tool and dosing guide; educate at point of sale that the familiar sensory cue is not a dosing signal."},
-      },
-      cat2:{
-        ok:     {status:"Shoppers correctly dose the large-format pack", reco:"Maintain dosing indicator; consider an illustrated guide for first-time users."},
-        warn:   {status:"Shoppers use a familiar sensory check to gauge usage — but this only signals underdosing, not correct dose", reco:"Add a clear fill line or dosing indicator; a single visible marking reduces overconsumption significantly."},
-        danger: {status:"The sensory check shoppers rely on only confirms they haven't underdosed — there is no upper-limit signal, so consumption runs 40–60% above intended levels", reco:"Dosing line on the closure plus a simple illustrated guide; pair with an education moment at first purchase."},
-      },
-    },
-  },
-  {
-    id:"mileage", icon:"📅", label:"Lasts to Payday", phase:"repeat",
-    generic:{
-      ok:     {status:"Big pack outlasts small-pack equivalent to next payday", reco:"Communicate this explicitly on-pack: 'Covers your full fortnight' or equivalent."},
-      warn:   {status:"Borderline — pack may run short if shopper overdoses", reco:"Ensure entry pack size equals or exceeds the typical small-pack bundle; pair with dosage fix."},
-      danger: {status:"Pack runs out before next payday → shopper tops up with small packs at higher unit cost → big pack feels more expensive in hindsight", reco:"Resize entry pack to match at least two weeks of small-pack usage at the correct dose; dosage fix is a prerequisite."},
-    },
-    catOverride:{
-      cat1:{
-        ok:     {status:"Big pack lasts the full period between paydays", reco:"Communicate duration on-pack with small-pack equivalence claim."},
-        warn:   {status:"Big pack covers the period but only if shopper doses correctly — overdosing risk is real", reco:"Entry pack size should exceed the typical small-pack bundle; dosage fix is prerequisite."},
-        danger: {status:"Overdosed packs run out in half the expected time. Shoppers top up with small packs and conclude the big pack was expensive.", reco:"Increase entry pack size to cover two weeks at the correct dose; make dosing guidance prominent and paired."},
-      },
-    },
-  },
-  {
-    id:"convenience", icon:"🏡", label:"Convenience", phase:"repeat",
-    generic:{
-      ok:     {status:"Easier to store and use than small packs in a typical home", reco:"Highlight convenience as a trial message — it's a pull factor, not just a retention factor."},
-      warn:   {status:"Adequate but not clearly better than small packs", reco:"Test a stand-up base or resealable closure; small format changes have outsized impact in cramped storage."},
-      danger: {status:"Spills, hard to store, or too bulky — shoppers revert to small packs after one poor experience", reco:"Resealable closure or stable base is the minimum viable fix; explore a compact form factor for small households."},
-    },
-    catOverride:{
-      cat2:{
-        ok:     {status:"Large-format pack stores cleanly without spill risk", reco:"Feature the resealable closure in media — convenience is an underused trial driver in this category."},
-        warn:   {status:"Pack can tip in a crowded usage area; some spill risk", reco:"Add a resealable closure on entry-size packs; this single feature resolves the #1 repeat barrier."},
-        danger: {status:"Packs without secured closures tip in cramped home spaces — one spill erases the value proposition and sends shoppers back to small packs permanently", reco:"Secured closure on all entry packs is the minimum viable fix; explore a stable, low-profile base design."},
-      },
-      cat1:{
-        ok:     {status:"Big pack stores and dispenses cleanly", reco:"Maintain; explore a resealable closure for premium tier."},
-        warn:   {status:"Big pack is harder to store than a stack of small packs in small homes", reco:"Explore a stable base and reclosable closure; test in consumer home placement research."},
-        danger: {status:"Big packs that are difficult to store are harder to manage than small packs in small homes — a practical friction that accelerates reversion", reco:"A stable base and reclosable closure are the priority fixes; the big pack should feel like an upgrade, not a compromise."},
-      },
-    },
-  },
-];
-
-const DIMS = ["portfolio","pack_comms","pricing","distribution","atl_btl"];
-const DIM_LABELS = {"portfolio":"Portfolio Coverage","pack_comms":"Pack Communication","pricing":"Price Advantage","distribution":"Shelf Availability","atl_btl":"Media & In-Store"};
-
-let activeSeg = "daily", activeCat = "cat1", activePlayCat = "cat1";
-
-function switchTab(t) {
-  document.querySelectorAll(".tab").forEach((el,i)=>el.classList.toggle("active",["consumer","playbook"][i]===t));
-  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-  document.getElementById(`panel-${t}`).classList.add("active");
+// ---- svg helpers ----
+const W=760,H=380,M={l:54,r:18,t:26,b:34};
+const IW=W-M.l-M.r, IH=H-M.t-M.b;
+function sx(y){return M.l + (y-Y0)/(Y1-Y0)*IW;}
+function svg(extra){return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${extra}</svg>`;}
+function eraBands(){
+  let s='';
+  D.eras.forEach((e,i)=>{
+    const x0=sx(e.start-0.5), x1=sx(e.end+0.5);
+    s+=`<rect x="${x0}" y="${M.t}" width="${x1-x0}" height="${IH}" fill="${i%2?'#0E7C66':'#4338CA'}" opacity="0.04"/>`;
+    s+=`<text x="${(x0+x1)/2}" y="${M.t-9}" text-anchor="middle" font-size="10" font-weight="700" fill="${C.muted}">${e.era}</text>`;
+  });
+  return s;
 }
-function setSeg(id,el) {
-  activeSeg=id;
-  document.getElementById("seg-grp").querySelectorAll(".toggle").forEach(t=>t.classList.remove("active"));
-  el.classList.add("active");
-  renderConsumer();
+function xAxis(yPix){
+  let s=`<line x1="${M.l}" y1="${yPix}" x2="${W-M.r}" y2="${yPix}" stroke="${C.line}"/>`;
+  [2002,2007,2012,2017,2022].forEach(y=>{
+    s+=`<text x="${sx(y)}" y="${yPix+15}" text-anchor="middle" font-size="10" fill="${C.muted}">'${String(y).slice(2)}</text>`;
+  });
+  return s;
 }
-function setCat(id,el) {
-  activeCat=id;
-  document.getElementById("cat-grp").querySelectorAll(".toggle").forEach(t=>t.classList.remove("active"));
-  el.classList.add("active");
-  renderConsumer();
-}
-function setPlayCat(id,el) {
-  activePlayCat=id;
-  document.getElementById("play-cat-grp").querySelectorAll(".toggle").forEach(t=>t.classList.remove("active"));
-  el.classList.add("active");
-  renderPlaybook();
-}
-
-function getPillarText(p, barrierVal, catId) {
-  const lvl = barrierVal===2?"ok":barrierVal===1?"warn":"danger";
-  return p.catOverride?.[catId]?.[lvl] || p.generic[lvl];
-}
-
-function barColor(v) { return v>0.65?"var(--ok)":v>0.35?"var(--warn)":"var(--danger)"; }
-
-function renderConsumer() {
-  const seg = DATA.segments.find(s=>s.id===activeSeg);
-  const cat = DATA.categories.find(c=>c.id===activeCat);
-  const barriers = cat.barriers;
-
-  document.getElementById("profile-stats").innerHTML = `
-    <div class="profile-stat"><div class="stat-val">${seg.pct}%</div><div class="stat-label">Share of shoppers</div></div>
-    <div class="profile-stat"><div class="stat-val">${seg.budget_range}</div><div class="stat-label">Typical category budget</div></div>
-    <div class="profile-stat"><div class="stat-val">${seg.payday_cycle}</div><div class="stat-label">Payday cycle</div></div>
-    <div class="profile-stat"><div class="stat-val">${seg.sari_sari_reliance}</div><div class="stat-label">Neighborhood store reliance</div></div>
-    <div class="profile-stat">
-      <div class="stat-val" style="color:${seg.upsizing_readiness==="High"?"var(--ok)":"var(--danger)"}">${seg.upsizing_readiness}</div>
-      <div class="stat-label">Upsizing readiness</div>
-    </div>`;
-
-  const segMult = activeSeg==="daily"?0.5:activeSeg==="semi"?0.85:1.0;
-  const priceAdj = Math.min(barriers.price_point/2*segMult,1);
-  const mileAdj  = Math.min(barriers.mileage/2*(activeSeg==="daily"?0.6:1.0),1);
-
-  document.getElementById("sulit-meter").innerHTML = `
-    <div class="sulit-row">
-      <div class="sulit-label">💰 Price fits budget</div>
-      <div class="sulit-bar-bg"><div class="sulit-bar-fill" style="width:${priceAdj*100}%;background:${barColor(priceAdj)}"></div></div>
-      <div class="sulit-val" style="color:${barColor(priceAdj)}">${Math.round(priceAdj*100)}%</div>
-    </div>
-    <div class="sulit-row">
-      <div class="sulit-label">📅 Lasts to next payday</div>
-      <div class="sulit-bar-bg"><div class="sulit-bar-fill" style="width:${mileAdj*100}%;background:${barColor(mileAdj)}"></div></div>
-      <div class="sulit-val" style="color:${barColor(mileAdj)}">${Math.round(mileAdj*100)}%</div>
-    </div>`;
-
-  const bothPass = priceAdj>0.65&&mileAdj>0.65, onePass=priceAdj>0.45||mileAdj>0.45;
-  const vEl = document.getElementById("sulit-verdict");
-  if (bothPass) {
-    vEl.style.cssText="background:rgba(38,222,129,0.08);border:1px solid rgba(38,222,129,0.25);color:var(--ok)";
-    vEl.innerHTML=`✓ Sulit — This segment is primed for big packs in ${cat.label}. Both conditions are likely met; remaining barriers sit in the repeat phase.`;
-  } else if (onePass) {
-    vEl.style.cssText="background:rgba(247,183,49,0.08);border:1px solid rgba(247,183,49,0.25);color:var(--warn)";
-    vEl.innerHTML=`⚠ Borderline — One Sulit condition is at risk for this segment. A promo price, pack resize, or dosage fix may be needed before the switch sticks.`;
-  } else {
-    vEl.style.cssText="background:rgba(252,92,101,0.08);border:1px solid rgba(252,92,101,0.25);color:var(--danger)";
-    vEl.innerHTML=`✗ Not yet Sulit — Small packs remain the rational choice for this segment in ${cat.label}. Both conditions need to be addressed before big packs can compete.`;
+function yGrid(vmin,vmax,yScale,fmt){
+  let s='';const steps=4;
+  for(let i=0;i<=steps;i++){
+    const v=vmin+(vmax-vmin)*i/steps, yp=yScale(v);
+    s+=`<line x1="${M.l}" y1="${yp}" x2="${W-M.r}" y2="${yp}" stroke="${C.line}" stroke-dasharray="2 3"/>`;
+    s+=`<text x="${M.l-8}" y="${yp+3}" text-anchor="end" font-size="10" fill="${C.muted}">${fmt(v)}</text>`;
   }
-
-  document.getElementById("barrier-callout").innerHTML = `
-    <div class="barrier-block primary">
-      <div class="barrier-rank">🔴 #1 Barrier</div>
-      <div class="barrier-name">${cat.barrier_1}</div>
-      <div class="barrier-why">${cat.barrier_1_why}</div>
-    </div>
-    <div class="barrier-block secondary">
-      <div class="barrier-rank">🟡 #2 Barrier</div>
-      <div class="barrier-name">${cat.barrier_2}</div>
-      <div class="barrier-why">${cat.barrier_2_why}</div>
-    </div>`;
-
-  document.getElementById("pillar-grid").innerHTML = PILLAR_DEFS.map(p=>{
-    const val=barriers[p.id], cls=val===2?"ok":val===1?"warn":"danger";
-    const txt=getPillarText(p,val,activeCat);
-    const pill=p.phase==="trial"
-      ?`<span style="font-size:10px;background:rgba(124,106,247,0.15);color:var(--accent);padding:1px 6px;border-radius:10px;margin-left:4px">Trial</span>`
-      :`<span style="font-size:10px;background:rgba(78,205,196,0.15);color:var(--accent2);padding:1px 6px;border-radius:10px;margin-left:4px">Repeat</span>`;
-    return `<div class="pillar-card ${cls}">
-      <div class="pillar-icon">${p.icon}</div>
-      <div class="pillar-name">${p.label}${pill}</div>
-      <div class="pillar-status">${txt.status}</div>
-      <div class="pillar-reco">${txt.reco}</div>
-    </div>`;
-  }).join("");
-
-  document.getElementById("exception-cards").innerHTML = DATA.exceptions.map(e=>`
-    <div class="exception-card">
-      <div class="exc-trigger">⚡ ${e.trigger}</div>
-      <div class="exc-desc">${e.description}</div>
-      <div class="exc-cat">e.g. ${e.example_category}</div>
-    </div>`).join("");
+  return s;
+}
+function linePath(vals,yScale){
+  return vals.map((v,i)=>`${i?'L':'M'}${sx(Y[i]).toFixed(1)},${yScale(v).toFixed(1)}`).join(' ');
 }
 
-function renderPlaybook() {
-  const cat = DATA.categories.find(c=>c.id===activePlayCat);
-  const catBrands = DATA.brands.filter(b=>b.category_id===activePlayCat);
-
-  document.getElementById("play-context").innerHTML = `
-    <div class="ctx-item"><div class="ctx-label">Category</div><div class="ctx-val">${cat.label}</div></div>
-    <div class="ctx-item"><div class="ctx-label">Small format</div><div class="ctx-val">${cat.small_format}</div></div>
-    <div class="ctx-item"><div class="ctx-label">Big pack format</div><div class="ctx-val">${cat.big_format}</div></div>
-    <div class="ctx-item"><div class="ctx-label">Est. small pack share</div><div class="ctx-val" style="color:var(--danger)">${cat.small_share}%</div></div>
-    <div class="ctx-item"><div class="ctx-label">#1 barrier</div><div class="ctx-val" style="color:var(--warn)">${cat.barrier_1}</div></div>`;
-
-  document.getElementById("brand-compare").innerHTML = catBrands.map(b=>`
-    <div class="brand-card ${b.market_position.toLowerCase()}">
-      <div class="brand-header">
-        <div class="brand-name">${b.brand}</div>
-        <div class="brand-pos ${b.market_position.toLowerCase()}">${b.market_position}</div>
-      </div>
-      ${DIMS.map(d=>`
-        <div class="dim-row">
-          <div class="dim-label">${DIM_LABELS[d]}</div>
-          <div class="dim-bar-bg"><div class="dim-bar-fill" style="width:${b[d]/5*100}%"></div></div>
-          <div class="dim-score">${b[d]}</div>
-        </div>`).join("")}
-      <div class="total-score"><span style="color:var(--muted)">Total</span><span class="total-val">${b.total}/25</span></div>
-    </div>`).join("");
-
-  const catAvg = DIMS.reduce((acc,d)=>{acc[d]=Math.round(catBrands.reduce((s,b)=>s+b[d],0)/catBrands.length*10)/10;return acc;},{});
-  document.getElementById("principles-detail").innerHTML = DATA.growth_principles.map((p,i)=>{
-    const avg=catAvg[p.id]||0, cls=avg>=4?"sc-ok":avg>=3?"sc-warn":"sc-danger";
-    return `<div class="principle-row">
-      <div><span class="principle-num">${String(i+1).padStart(2,"0")}</span><span class="principle-name">${p.label}</span></div>
-      <div class="principle-desc">${p.description}</div>
-      <div><div class="score-circle ${cls}" style="float:right">${avg}</div><div style="font-size:10px;color:var(--muted);text-align:right;margin-top:4px">avg</div></div>
-    </div>`;
-  }).join("");
-
-  const leader = catBrands.find(b=>b.market_position==="Leader");
-  document.getElementById("gap-tbody").innerHTML = DIMS.map(d=>{
-    const ls=leader[d], avg=catAvg[d], gap=ls-avg;
-    const label=DATA.growth_principles.find(p=>p.id===d)?.label||d;
-    const priority=gap>1.5?"High":gap>0.7?"Medium":"Low";
-    const pc=priority==="High"?"badge-danger":priority==="Medium"?"badge-warn":"badge-ok";
-    const sc=ls>=4?"sc-ok":ls>=3?"sc-warn":"sc-danger";
-    return `<tr>
-      <td style="font-weight:600">${label}</td>
-      <td><div class="score-circle ${sc}" style="width:28px;height:28px;font-size:12px;display:inline-flex">${ls}</div></td>
-      <td style="color:var(--muted)">${avg}</td>
-      <td style="color:${gap>1?"var(--ok)":"var(--muted)"}">+${gap.toFixed(1)}</td>
-      <td><span class="badge ${pc}">${priority}</span></td>
-    </tr>`;
-  }).join("");
-
-  document.getElementById("play-tip").innerHTML = `
-    <strong>Category note:</strong> In ${cat.label}, the primary conversion barrier is <strong style="color:var(--accent)">${cat.barrier_1}</strong>.
-    Brands that address this first will disproportionately capture conversion from the ~${cat.small_share}% of volume still in small formats.
-    ${cat.exception_note}`;
+// ---- TAB 0 ----
+function eraStrip(){
+  document.getElementById('mult').textContent = D.category.units_mult+'x';
+  document.getElementById('eraStrip').innerHTML = D.vpm.map(v=>`
+    <div class="era-card"><div class="tag">${v.era} · ${v.label}</div><div class="yr">${v.start}–${v.end}</div>
+    <div class="lbl">${v.label}</div>
+    <div class="cagr">${v.value_cagr}%<small> value CAGR</small></div>
+    <div class="vol">${v.volume_cagr}% volume · ${v.price_vs_inflation>=0?'+':''}${v.price_vs_inflation}pt vs CPI</div></div>`).join('');
+}
+function chartTraj(){
+  const a=D.category.vol_index, b=D.category.value_index;
+  const vmax=Math.max(...a,...b)*1.05, vmin=80;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  g+=`<path d="${linePath(a,ys)}" fill="none" stroke="${C.teal}" stroke-width="2.4"/>`;
+  g+=`<path d="${linePath(b,ys)}" fill="none" stroke="${C.indigo}" stroke-width="2.4" stroke-dasharray="1 0"/>`;
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_traj').innerHTML=svg(g);
+}
+function chartVPM(){
+  const eras=D.vpm, n=eras.length, comps=[['volume_pts',C.teal],['price_pts',C.slate],['mix_pts',C.indigo]];
+  let vmax=0,vmin=0;
+  eras.forEach(e=>comps.forEach(([k])=>{vmax=Math.max(vmax,e[k],e.value_cagr);vmin=Math.min(vmin,e[k]);}));
+  vmax=Math.ceil(vmax+1);vmin=Math.floor(vmin-0.5);
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  const gw=plotW/n, bw=gw*0.2;
+  let g=yGrid(vmin,vmax,ys,v=>v.toFixed(0));
+  g+=`<line x1="${L}" y1="${ys(0)}" x2="${R}" y2="${ys(0)}" stroke="${C.muted}"/>`;
+  eras.forEach((e,i)=>{
+    const cx=L+gw*(i+0.5);
+    comps.forEach(([k,col],j)=>{
+      const v=e[k], x=cx+(j-1)*bw-bw/2, y0=ys(0), y1=ys(v);
+      g+=`<rect x="${x}" y="${Math.min(y0,y1)}" width="${bw}" height="${Math.abs(y1-y0)}" fill="${col}" rx="1.5"/>`;
+    });
+    g+=`<circle cx="${cx}" cy="${ys(e.value_cagr)}" r="4" fill="${C.ink}"/>`;
+    g+=`<text x="${cx}" y="${ys(e.value_cagr)-9}" text-anchor="middle" font-size="10" font-weight="700" fill="${C.ink}">${e.value_cagr}</text>`;
+    g+=`<text x="${cx}" y="${M.t+IH+15}" text-anchor="middle" font-size="10" fill="${C.muted}">${e.era}</text>`;
+  });
+  document.getElementById('c_vpm').innerHTML=svg(g);
+}
+function chartInfl(){
+  const a=D.category.price_index, b=D.category.cpi_index;
+  const vmax=Math.max(...a,...b)*1.04, vmin=95;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  g+=`<path d="${linePath(b,ys)}" fill="none" stroke="${C.muted}" stroke-width="2" stroke-dasharray="5 4"/>`;
+  g+=`<path d="${linePath(a,ys)}" fill="none" stroke="${C.clay}" stroke-width="2.4"/>`;
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_infl').innerHTML=svg(g);
 }
 
-renderConsumer();
-renderPlaybook();
+// ---- TAB 1 ----
+function chartDrv(){
+  const ks=[['penetration',C.teal],['consumption',C.indigo],['premiumization',C.gold]];
+  let all=[];ks.forEach(([k])=>all=all.concat(D.drivers[k]));
+  const vmax=Math.max(...all)*1.04, vmin=Math.min(...all)*0.97;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v));
+  ks.forEach(([k,col])=>g+=`<path d="${linePath(D.drivers[k],ys)}" fill="none" stroke="${col}" stroke-width="2.4"/>`);
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_drv').innerHTML=svg(g);
+}
+function chartMix(){
+  const order=D.cells.order, ys=v=>M.t+IH-v/100*IH;
+  let cum=Y.map(()=>0), g=yGrid(0,100,ys,v=>v+'%');
+  order.forEach(c=>{
+    const top=cum.map((b,i)=>b+D.cells.vshare[c][i]);
+    let path=`M${sx(Y0)},${ys(cum[0])}`;
+    Y.forEach((y,i)=>path+=`L${sx(y).toFixed(1)},${ys(top[i]).toFixed(1)}`);
+    for(let i=Y.length-1;i>=0;i--)path+=`L${sx(Y[i]).toFixed(1)},${ys(cum[i]).toFixed(1)}`;
+    path+='Z';
+    g+=`<path d="${path}" fill="${CELLCOL[c]}" opacity="0.88"/>`;
+    cum=top;
+  });
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_mix').innerHTML=svg(g);
+  document.getElementById('mixleg').innerHTML=order.map(c=>`<span><i style="background:${CELLCOL[c]}"></i>${D.cells.label[c]}</span>`).join('');
+}
+function trendChart(o){
+  const w=400,h=240,m={l:46,r:14,t:30,b:28}, iw=w-m.l-m.r, ih=h-m.t-m.b;
+  const xs=y=>m.l+(y-Y0)/(Y1-Y0)*iw;
+  const ys=v=>m.t+ih-(v-o.yMin)/(o.yMax-o.yMin)*ih;
+  let g='';
+  D.eras.forEach((e,i)=>{
+    const x0=xs(e.start-0.5), x1=xs(e.end+0.5), isE2=i===1;
+    g+=`<rect x="${x0}" y="${m.t}" width="${x1-x0}" height="${ih}" fill="${isE2?C.teal:'#94a3b8'}" opacity="${isE2?0.10:0.05}"/>`;
+    g+=`<text x="${(x0+x1)/2}" y="${m.t-15}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${isE2?C.teal:C.muted}">${e.era}</text>`;
+    g+=`<text x="${(x0+x1)/2}" y="${m.t-4}" text-anchor="middle" font-size="10" font-weight="700" fill="${isE2?C.teal:C.slate}">${o.eraLabels[i]}</text>`;
+  });
+  for(let k=0;k<=3;k++){const v=o.yMin+(o.yMax-o.yMin)*k/3, yp=ys(v);
+    g+=`<line x1="${m.l}" y1="${yp}" x2="${w-m.r}" y2="${yp}" stroke="${C.line}" stroke-dasharray="2 3"/>`;
+    g+=`<text x="${m.l-6}" y="${yp+3}" text-anchor="end" font-size="9.5" fill="${C.muted}">${o.yFmt(v)}</text>`;}
+  if(o.zeroLine){const yp=ys(0);g+=`<line x1="${m.l}" y1="${yp}" x2="${w-m.r}" y2="${yp}" stroke="${C.muted}" stroke-width="1"/>`;}
+  [2002,2012,2022].forEach(y=>g+=`<text x="${xs(y)}" y="${h-8}" text-anchor="middle" font-size="9.5" fill="${C.muted}">'${String(y).slice(2)}</text>`);
+  o.series.forEach(s=>{
+    const pts=s.x.map((xx,i)=>[xs(xx),ys(s.y[i])]);
+    if(s.fillToZero){let d=`M${pts[0][0].toFixed(1)},${ys(0)}`;pts.forEach(p=>d+=`L${p[0].toFixed(1)},${p[1].toFixed(1)}`);d+=`L${pts[pts.length-1][0].toFixed(1)},${ys(0)}Z`;
+      g+=`<path d="${d}" fill="${s.color}" opacity="0.14"/>`;}
+    g+=`<path d="${pts.map((p,i)=>`${i?'L':'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}" fill="none" stroke="${s.color}" stroke-width="${s.width||2.4}"${s.dash?` stroke-dasharray="${s.dash}"`:''}/>`;
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%">${g}</svg>`;
+}
+function vectors(){
+  const V=D.vectors, Y=D.years, GY=D.gyears, pe=a=>a.map(v=>(v>0?'+':'')+Math.round(v)+'%');
+  const mx=a=>Math.max(...a), legrow=(arr)=>`<div class="legend">${arr.map(([c,t,ln])=>`<span><i class="${ln?'ln':''}" style="background:${c};${ln?'height:3px;width:16px':''}"></i>${t}</span>`).join('')}</div>`;
+  // PORTFOLIO — entry vs premium SKUs actually in market
+  const eS=D.skus.entry, pS=D.skus.premium, smax=mx(eS.concat(pS))*1.25;
+  const port=trendChart({yMin:0,yMax:smax,yFmt:v=>Math.round(v),eraLabels:pe(V.portfolio),zeroLine:false,
+    series:[{x:Y,y:eS,color:C.gold,width:2.6},{x:Y,y:pS,color:C.indigo,width:2.6}]});
+  // MEDIA — GRP level
+  const grp=D.media.grp_total;
+  const media=trendChart({yMin:0,yMax:mx(grp)*1.12,yFmt:v=>Math.round(v/1000)+'k',eraLabels:pe(V.media),
+    series:[{x:GY,y:grp,color:C.indigo,width:2.6,fillToZero:true}]});
+  // PRICING — price index vs CPI, the gap is the story
+  const pi=D.category.price_index, cpi=D.category.cpi_index, pmin=95, pmax=mx(pi.concat(cpi))*1.03;
+  const pricing=trendChart({yMin:pmin,yMax:pmax,yFmt:v=>Math.round(v),
+    eraLabels:V.pricing.map(v=>(v>0?'+':'')+v.toFixed(1)+'pt'),
+    series:[{x:Y,y:cpi,color:C.muted,width:2,dash:'5 4'},{x:Y,y:pi,color:C.clay,width:2.6}]});
+  // DISTRIBUTION — reach (ND) and shelf points (TDP), indexed to base
+  const nd=D.distribution.nd, tdp=D.distribution.tdp, nd0=nd[0];
+  const ndi=nd.map(v=>v/nd0*100);
+  const dist=trendChart({yMin:90,yMax:mx(ndi.concat(tdp))*1.08,yFmt:v=>Math.round(v),eraLabels:pe(V.distribution),
+    series:[{x:Y,y:ndi,color:C.teal,width:2.6},{x:Y,y:tdp,color:C.tealL,width:2.6,dash:'1 0'}]});
+  const cards=[
+    ['Portfolio','SKUs in market &mdash; entry vs premium',port,
+      [[C.gold,'Entry (Base) packs',0],[C.indigo,'Premium packs',0]],
+      'Entry packs were added fast in E2 to recruit new users; premium packs only multiplied in E3. The range you fielded was different in every era.'],
+    ['Media','Media weight &mdash; GRP per year',media,[[C.indigo,'GRP',true]],
+      'Spend sat low and flat through E1, then stepped up roughly 3x to carry the recruitment message in E2, plateaued in E3 and was pulled back in E4.'],
+    ['Pricing','Category price index vs CPI',pricing,[[C.clay,'Category price',true],[C.muted,'CPI',true]],
+      'Price tracked under inflation only in E2 &mdash; the lines split &mdash; keeping the category accessible during recruitment. From E3 price runs at or above CPI.'],
+    ['Distribution','Reach vs shelf points (indexed)',dist,[[C.teal,'Numeric distribution',true],[C.tealL,'Shelf points (TDP)',true]],
+      'Both reach and shelf points climbed steeply in E2; shelf points outran reach as pack-sizes multiplied. By E3 reach hit its ceiling and the curve flattens.'],
+  ];
+  document.getElementById('vectors').innerHTML=cards.map(([h,sub,svg,leg,d])=>`
+    <div class="card"><h3>${h}</h3><p class="cap">${sub}</p>${svg}${legrow(leg)}<p class="d" style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:10px 0 0">${d}</p></div>`).join('');
+}
+function chartMedia(){
+  const gy=D.gyears, bens=D.media.benefits, n=gy.length;
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-v/100*IH;
+  const bw=plotW/n*0.74, step=plotW/n;
+  let g=yGrid(0,100,ys,v=>v+'%');
+  gy.forEach((y,i)=>{
+    let base=0; const x=L+step*i+(step-bw)/2;
+    bens.forEach((b,j)=>{
+      const v=D.media.share[b][i], y1=ys(base+v), y0=ys(base);
+      g+=`<rect x="${x}" y="${y1}" width="${bw}" height="${y0-y1}" fill="${BENCOL[j]}" opacity="0.9"/>`;
+      base+=v;
+    });
+    if(i%3===0||i===n-1)g+=`<text x="${x+bw/2}" y="${M.t+IH+15}" text-anchor="middle" font-size="9" fill="${C.muted}">'${String(y).slice(2)}</text>`;
+  });
+  document.getElementById('c_media').innerHTML=svg(g);
+  document.getElementById('medleg').innerHTML=bens.map((b,j)=>`<span><i style="background:${BENCOL[j]}"></i>${b}</span>`).join('');
+}
+
+// ---- TAB 2 ----
+function chartShare(){
+  const ord=D.brands.order;
+  let all=[];ord.forEach(b=>all=all.concat(D.brands.share[b]));
+  const vmax=Math.max(...all)*1.05, vmin=0;
+  const ys=v=>M.t+IH-(v-vmin)/(vmax-vmin)*IH;
+  let g=eraBands()+yGrid(vmin,vmax,ys,v=>Math.round(v)+'%');
+  ord.forEach(b=>{
+    g+=`<path d="${linePath(D.brands.share[b],ys)}" fill="none" stroke="${BRCOL[b]}" stroke-width="${b==='Auria'?3:2}"/>`;
+  });
+  g+=xAxis(M.t+IH);
+  document.getElementById('c_share').innerHTML=svg(g);
+  document.getElementById('brleg').innerHTML=ord.map(b=>`<span><i class="ln" style="background:${BRCOL[b]}"></i>${b}</span>`).join('');
+}
+function chartFair(){
+  const ef=D.era_fair, n=ef.length;
+  const vmax=Math.max(...ef.map(e=>Math.max(e.contrib,e.share)))*1.12;
+  const L=M.l,R=W-M.r,plotW=R-L, ys=v=>M.t+IH-v/vmax*IH;
+  const gw=plotW/n, bw=gw*0.4;
+  let g=yGrid(0,vmax,ys,v=>Math.round(v)+'%');
+  ef.forEach((e,i)=>{
+    const cx=L+gw*(i+0.5), x=cx-bw/2, above=e.contrib>=e.share;
+    g+=`<rect x="${x}" y="${ys(e.contrib)}" width="${bw}" height="${M.t+IH-ys(e.contrib)}" fill="${above?C.teal:C.clay}" rx="2"/>`;
+    g+=`<text x="${cx}" y="${ys(e.contrib)-7}" text-anchor="middle" font-size="11" font-weight="700" fill="${above?C.teal:C.clay}">${e.contrib}%</text>`;
+    // fair share marker
+    g+=`<line x1="${x-6}" y1="${ys(e.share)}" x2="${x+bw+6}" y2="${ys(e.share)}" stroke="${C.ink}" stroke-width="2.4"/>`;
+    g+=`<text x="${cx}" y="${M.t+IH+15}" text-anchor="middle" font-size="10" fill="${C.muted}">${e.era}</text>`;
+  });
+  document.getElementById('c_fair').innerHTML=svg(g);
+}
+
+// ---- TAB 3 ----
+function nowTab(){
+  const pen=D.drivers.penetration, sh=D.brands.share, mer=sh['Mercato PL'], aur=sh['Auria'];
+  const lastE=D.vpm[3], penPeak=Math.max(...pen), penPeakYr=Y[pen.indexOf(penPeak)];
+  const aurPeak=Math.max(...aur), aurNow=aur[aur.length-1];
+  const merTrough=Math.min(...mer), merNow=mer[mer.length-1];
+  document.getElementById('nowkpis').innerHTML=`
+    <div class="kpi"><div class="v dn">${lastE.value_cagr}%</div><div class="l">Value CAGR now (E4) vs ${D.vpm[1].value_cagr}% at peak (E2)</div></div>
+    <div class="kpi"><div class="v dn">${aurNow}%</div><div class="l">Leader share, down from ${aurPeak}% peak</div></div>
+    <div class="kpi"><div class="v up">${merNow}%</div><div class="l">Value entrant share, recovered from ${merTrough}% trough</div></div>
+    <div class="kpi"><div class="v">${lastE.volume_cagr}%</div><div class="l">Volume CAGR now &mdash; growth is price, not demand</div></div>`;
+  document.getElementById('changed').innerHTML=[
+    `Penetration <b>saturated</b> &mdash; peaked ~${penPeakYr} and has since slipped, so the new-user engine that built E2 is spent.`,
+    `Buyers are <b>down-tiering</b>: Base/Small value share rebounded in E4 after the premium run.`,
+    `The <b>value entrant returned</b> (${merTrough}% &rarr; ${merNow}%), taking incremental growth the leader used to own.`,
+    `Growth is now <b>price-led</b> (${lastE.volume_cagr}% volume of ${lastE.value_cagr}% value), and price has caught back up to inflation.`,
+  ].map(t=>`<li>${t}</li>`).join('');
+  document.getElementById('comprows').innerHTML=[
+    ['Value entrant','Re-pricing into reopened entry tiers','up','Gaining'],
+    ['Premium niche','Holding premium/big-pack buyers','fl','Stable'],
+    ['Mainstream rival','Defensive, ceding share','dn','Slipping'],
+    ['Leader (you)','Over-indexed on a saturated vector','dn','At risk'],
+  ].map(([w,m,t,lab])=>`<tr><td class="who">${w}</td><td>${m}</td><td><span class="pill ${t}">${lab}</span></td></tr>`).join('');
+  const recos=[
+    ['Portfolio','Re-open the entry door','Barbell the range: refresh accessible Base/Small trial packs to restart penetration, while defending the Premium/Big ceiling that drove E3 value.'],
+    ['Media','Rebalance benefit spaces','Weight was over-rotated to Value &amp; Longevity for a decade. Shift toward Smart Value and Hygiene &amp; Protection to meet the value entrant where it is winning.'],
+    ['Pricing','Protect entry price points','E4 pricing ran ahead of volume. Hold price-pack entry to slow down-tiering rather than harvest price into a softening category.'],
+    ['Distribution','Defend the shelf','Numeric distribution has plateaued near its ceiling; the next point comes from TDP &mdash; more pack-sizes per store &mdash; not new stores, especially against value-entrant listings.'],
+    ['Comms','Shift conversion to retention','The job moved from trading new users in to keeping them from trading down. Lead on superiority versus the value alternatives, not versus the legacy form that has already gone.'],
+  ];
+  document.getElementById('recos').innerHTML=recos.map((r,i)=>`
+    <div class="reco"><div class="num">${String(i+1).padStart(2,'0')}</div>
+    <div><div class="vlab">${r[0]}</div><h4>${r[1]}</h4><p>${r[2]}</p></div></div>`).join('');
+  document.getElementById('read3').textContent=
+    `The category was built on penetration, and penetration is done. Defending the ${aurNow}% share means re-opening new-user access and meeting the value entrant on price-pack and message — not harvesting price out of a category growing only ${lastE.volume_cagr}% in real volume.`;
+}
+
+function reads(){
+  document.getElementById('read0').innerHTML=`The high-growth era (E2, ${D.vpm[1].value_cagr}% value CAGR) was overwhelmingly <b>volume-led</b> — ${D.vpm[1].volume_pts} of ${D.vpm[1].value_cagr} points came from volume, with pricing held ${Math.abs(D.vpm[1].price_vs_inflation)}pt below inflation. The category never bought its way to growth; it recruited users. E4 inverts this: thin volume, price doing the work.`;
+  document.getElementById('read1').innerHTML=`Penetration is the lead line through E2 — new buyers entering the category — while consumption and premiumization only take over in E3. Underneath sits five vectors moving together: an accessible portfolio, 3x media weight on a single conversion message, pricing below inflation, distribution reaching from ${D.distribution.nd[0]}% to ${D.distribution.nd[D.distribution.nd.length-1]}% of stores, and comms concentrated on Value &amp; Longevity.`;
+  document.getElementById('read2').innerHTML=`In E2–E3 Auria's contribution to growth ran far above its fair share — it captured more of every incremental point than its size entitled it to. In E4 that flips: contribution falls toward and below fair share as the value entrant takes the marginal growth.`;
+}
+
+// ---- tabs ----
+let built=[false,false,false,false];
+function build(t){
+  if(built[t])return; built[t]=true;
+  if(t===0){eraStrip();chartTraj();chartVPM();chartInfl();}
+  if(t===1){chartDrv();chartMix();vectors();chartMedia();}
+  if(t===2){chartShare();chartFair();}
+  if(t===3){nowTab();}
+  if(t===0)reads(); if(t===1)reads(); if(t===2)reads();
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const t=+b.dataset.t;
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.panelpage').forEach((p,i)=>p.classList.toggle('active',i===t));
+    build(t);
+  });
+});
+reads(); build(0);
 </script>
 </body>
 </html>
